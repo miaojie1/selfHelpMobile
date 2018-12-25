@@ -1,0 +1,31 @@
+/* 内容太长自动换行，直接定义再less文件中，不起作用 */
+.span1 {
+  overflow: hidden;
+  white-space: nowrap; /*防止文字太长时候自动折行*/
+  text-overflow: ellipsis; /*ie下 可以自定出省略号*/
+}
+/* 头部样式 */
+.mintui {
+  font-size: 19px !important;
+}
+.mint-header-title {
+  font-size: 13pt !important;
+  padding-top: 15pt !important;
+  line-height: 12pt !important;
+}
+.mint-header {
+  font-size: 12pt !important;
+  background-color:#465295 !important;
+  height: 64px !important;
+}
+.mint-header-button {
+  font-size: 12pt !important;
+  padding-top: 15pt !important  
+}
+.mint-header-button .is-right {
+  font-size: 12pt !important;
+}
+.mint-button-text {
+  padding-top: 15pt !important;
+  margin-left: -3pt !important;
+}
