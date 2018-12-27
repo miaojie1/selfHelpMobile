@@ -5,7 +5,7 @@
         <mt-button icon="back">返回</mt-button>
       </router-link>
     </mt-header>
-    <div style="width: 100%; height: 100pt;" v-show="show">
+    <div style="width: 100%; height: 100pt;background-color: white" v-show="show">
       <div style="width: 10%; margin:0 auto; margin-top: 200pt">
         <mt-spinner :size="30" type="fading-circle" style="margin:0 auto;"></mt-spinner>
       </div>
@@ -13,7 +13,7 @@
     <div v-if="flowRows === null && show === false">
       <no-data title="流程"></no-data>
     </div>
-    <div class="flowContent" v-if="!show && flowRows != null">
+    <div class="flowContent" v-else-if="!show && flowRows != null">
       <div class="flowDetails" v-for="(item, index) in flowRows" :key="index">
         <div v-if="item.RESR_STATUS === 'processed'">
           <div class="nodeImgBody">

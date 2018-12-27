@@ -15,11 +15,11 @@
         <span>薪资比例</span>
       </div>
       <div class="chart-item" @click="handleChart('学历')">
-        <img src="@/assets/a20.png">
+        <img src="@/assets/cxueli.png">
         <span>学历比例</span>
       </div>
       <div class="chart-item" @click="handleChart('性别')">
-        <img src="@/assets/crenyuan.png">
+        <img src="@/assets/cxingbie.png">
         <span>性别比例</span>
       </div>
     </div>

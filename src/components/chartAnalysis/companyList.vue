@@ -33,27 +33,17 @@
         placeholder="搜索">
       </mt-search>
       <!-- 搜索框及时显示 -->
-      <div id="showResults" v-show="resultsPanel">
-        <div class="resItem" v-show="resultsPanel" v-for="(item, index) in results" :key="index" @click="goToDepart(item.label)">
+      <div id="showResults" v-show="resultsPanel" :class="{haveShow: resultsPanel}">
+        <div class="resItem" v-for="(item, index) in results" :key="index" @click="goToDepart(item.label)">
           <div class="resItem-text">
             {{item.label}}
           </div>
           <img src="@/assets/chart-circle.png" class="li-chartImg">
         </div>
       </div>
-      <!-- <div class="departContainer">
-        <ul>
-          <li v-for="(item, index) in depart" :key="index" @click="goToDepart(item.label)">
-            <img src="@/assets/depart.png" class="li-depart-img">
-            <span>{{item.label}}</span>
-            <img src="@/assets/chart-renyuan.png" class="li-chartImg">
-            <img src="@/assets/chart-circle.png" class="li-chartImg">
-          </li>
-        </ul>
-      </div> -->
       <div class="departContainer">
         <ul v-for="(depart, index) in companyList1" :key="index">
-          <div class="ul-title" @click="goToDepart(item.label)">
+          <div class="ul-title" @click="goToDepart(depart.label)">
             {{depart.depart}}
           </div>
           <li v-for="(item, index) in depart.emp" :key="index">
@@ -127,19 +117,19 @@ export default {
           emp: [
             {
               empNum: '00011',
-              empName: '张三1'
+              empName: '研发组'
             },
             {
               empNum: '00012',
-              empName: '张三2'
+              empName: '测试组'
             },
             {
               empNum: '00013',
-              empName: '张三3'
+              empName: '实施组'
             },
             {
               empNum: '00014',
-              empName: '张三4'
+              empName: '方案组'
             }
           ]
         },
@@ -150,19 +140,19 @@ export default {
           emp: [
             {
               empNum: '00011',
-              empName: '李三1'
+              empName: '研发组'
             },
             {
               empNum: '00012',
-              empName: '李三2'
+              empName: '测试组'
             },
             {
               empNum: '00013',
-              empName: '李三3'
+              empName: '实施组'
             },
             {
               empNum: '00014',
-              empName: '李三4'
+              empName: '方案组'
             }
           ]
         },
@@ -173,19 +163,19 @@ export default {
           emp: [
             {
               empNum: '00011',
-              empName: '张三1'
+              empName: '研发组'
             },
             {
               empNum: '00012',
-              empName: '张三2'
+              empName: '测试组'
             },
             {
               empNum: '00013',
-              empName: '张三3'
+              empName: '实施组'
             },
             {
               empNum: '00014',
-              empName: '张三4'
+              empName: '方案组'
             }
           ]
         },
@@ -196,19 +186,19 @@ export default {
           emp: [
             {
               empNum: '00011',
-              empName: '李三1'
+              empName: '研发组'
             },
             {
               empNum: '00012',
-              empName: '李三2'
+              empName: '测试组'
             },
             {
               empNum: '00013',
-              empName: '李三3'
+              empName: '实施组'
             },
             {
               empNum: '00014',
-              empName: '李三4'
+              empName: '方案组'
             }
           ]
         }
@@ -437,7 +427,7 @@ export default {
       this.$router.push({
         path: '/index',
         query: {
-          userName: this.$store.getters.missionEmpNum
+          userName: window.localStorage.getItem('empNum')
         }
       })
     },
@@ -465,6 +455,7 @@ export default {
             this.results.push(element)
             this.resultsPanel = true
           }
+          // console.log(this.$pinyin.pinyin(value))
         })
       }
     },
@@ -558,7 +549,7 @@ body {
 }
 .select-list-panel {
   width: 100%;
-  z-index: 999999;
+  z-index: 9999;
   position: absolute;
   background-color: white;
   margin-top: 48pt;
@@ -650,7 +641,6 @@ select {
   overflow: scroll;
   width: 100%;
   height: 100%;;
-  // background-color: #465295 !important
 }
 .chartField {
   position: fixed;
@@ -692,10 +682,14 @@ select {
     font-size: 10pt;
   }
 }
+#showResults {
+  width: 100% !important;
+  position: relative !important;
+}
 .resItem {
   width: 99%;
   height: 30pt;
-  background: #f1f1f1;
+  background: #f7f5f4;
   float: left;
   height: 100%;
   padding-top: 10pt;
@@ -726,13 +720,14 @@ select {
     }
   }
   li {
+    width: 100%;
     margin: 0pt;
     list-style: none;
     height: 30pt;
     text-align: left;
-    margin-left: -5pt;
     padding-left: 10pt;
     line-height: 29pt;
+    background: white;
     border-bottom: 0.5pt #D9D9D9 solid;
     span {
       width: 60%;
@@ -755,15 +750,14 @@ select {
     margin-right: 12pt;
   }
 }
-#showResults {
-  width: 100% !important;
-  position: relative !important;
-  z-index: 2000 !important;
-}
 .haveSelect {
   background: #EEEFF6;
 }
 .haveScroll {
   position: fixed;
+}
+.haveShow {
+  position: fixed !important;
+  overflow: hidden;
 }
 </style>
