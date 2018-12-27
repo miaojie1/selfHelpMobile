@@ -16,11 +16,6 @@ export default new Router({
       component: () => import('@/components/index.vue')
     },
     {
-      path: '/test',
-      name: 'test',
-      component: () => import('@/components/chartAnalysis/companyList.vue')
-    },
-    {
       path: '/myWage',
       name: 'MyWage',
       component: () => import('@/components/myWage/myWage')

@@ -1,8 +1,8 @@
 <template>
   <div>
     <mt-header title="我的薪酬" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
     </mt-header>
     <div class="wage_header_content">
@@ -96,14 +96,11 @@ export default{
       content: [],
       // 用于保存接口返回的所有的key值
       contentKey: [],
-      backUrl: '',
       isShow: false
     }
   },
   created: function () {
-    console.log('wage====' + this.$route.query.userName)
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    this.backUrl = '/index?userName=' + this.$store.getters.missionEmpNum
     this.getInfor()
     // 初始化当前的日期
     let date = new Date()
@@ -180,7 +177,6 @@ export default{
         if (mm1 < 10) {
           mm1 = '0' + mm1
         }
-        console.log('年份，月份：' + yy1 + ',' + mm1)
         this.month_echarts[j] = yy1 + '' + mm1
       }
     },
@@ -193,17 +189,12 @@ export default{
       let data = {
         'requestBody': JSON.stringify(param)
       }
-      console.log('body=======' + JSON.stringify(data))
       this.$http.post(wageUrl, data).then((val) => {
         if (typeof (val.data.data.allMoney) !== 'undefined') {
           this.wageValue[i] = val.data.data.allMoney
         } else {
           this.wageValue[i] = 0
         }
-        // this.content = val.data.data.content
-        // this.contentKey = val.data.data.contentKey
-        // this.wageLength = this.content.length
-        // this.setWage()
         this.drawLine()
       })
     },
@@ -220,7 +211,6 @@ export default{
         let keys = []
         let keysText = []
         let keysValue = []
-        // console.log("contents.length=" + contents.length)
         for (let i = 0; i < contents.length; i++) {
           // 将工资key，工资名称依次取出存入暂存数组
           keys[i] = contents[i].key
@@ -313,9 +303,7 @@ export default{
       // 防止重复事件
       myCharts.off('click')
       myCharts.on('click', function (value) {
-        console.log('value.name-------------------')
         if (value.componentType === 'xAxis') {
-          console.log(value.value)
           _this.currentYear = (value.value).substring(0, 4)
           _this.currentMonth = (value.value).substring(4, 7)
           _this.getUserWage(value.value)
@@ -351,8 +339,6 @@ export default{
           }
         })
         this.wageLength = this.content.length
-        console.log(this.wageLength)
-        console.log(JSON.stringify(this.content[0]))
         if (this.wageLength === 0 || JSON.stringify(this.content[0]) === '{}') {
           this.isShow = false
           if (this.wageLength > 0) {
@@ -377,6 +363,9 @@ export default{
         this.username = val.data.data.content.H_HU_NAME
         this.userPart = val.data.data.content.H_OR_BMMC
       })
+    },
+    handleBack () {
+      window.webkit.messageHandlers.Call.postMessage({})
     }
   },
   components: {

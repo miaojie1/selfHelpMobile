@@ -86,7 +86,6 @@ export default {
       'requestBody': JSON.stringify(param)
     }
     this.$http.post(postDetailUrl, data).then((val) => {
-      console.log('是否申请' + val.data.data.isApply)
       // 保存职位详情
       this.detail = val.data.data
       // 保存是否已申请字段
@@ -135,7 +134,6 @@ export default {
     // 取消申请职位
     cancelApply () {
       let cancelApplyUrl = '/recruit/disapply'
-      console.log('detail------id:' + this.$route.query.recruitId)
       var param = {
         origin: '0',
         positionId: this.postId,

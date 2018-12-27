@@ -1,8 +1,8 @@
 <template>
   <div>
     <mt-header title="我的待办" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
     </mt-header>
     <!-- 数据加载动画 -->
@@ -41,14 +41,12 @@ export default{
       // 已办保存的数据
       haveDoneTotalData: [],
       // 判断加载动画是否显示
-      show: true,
-      backUrl: ''
+      show: true
     }
   },
   created: function () {
     // 设置用户全局变量
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    this.backUrl = '/index?userName=' + this.missionEmpNum
     // 设置任务类型全局变量，待办or已办
     this.$store.dispatch('modifyMissionTaskType', 'pending')
     this.getToDoMission()
@@ -80,6 +78,9 @@ export default{
       }).catch((val) => {
         alert('获取信息，出现错误')
       })
+    },
+    handleBack () {
+      window.webkit.messageHandlers.Call.postMessage({})
     }
   },
   computed: {

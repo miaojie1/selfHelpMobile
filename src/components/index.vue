@@ -194,7 +194,6 @@ export default {
       //     return i++
       //   }
       // })
-      // console.log('i===' + this.todoCount)
     },
     getDanjuData () {
       let url = '/process/myInvoices'

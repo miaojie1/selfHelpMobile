@@ -120,15 +120,12 @@ export default {
         } else {
           this.headContentKey = val.data.data.contentKey[0]
           this.headContent = val.data.data.content[0]
-          console.log(this.content)
         }
       })
     },
     // 点击"历史记录"获取流程详情
     showFlowDetails () {
       let params = this.$store.getters.missionFlowDetail
-      console.log('_______________________________')
-      console.log(params)
       this.$router.push({
         path: '/flowDetails',
         query: {

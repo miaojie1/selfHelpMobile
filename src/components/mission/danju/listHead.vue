@@ -76,7 +76,6 @@ export default {
       this.djItem = val
     },
     goListBody () {
-      console.log('goListBody')
       this.$store.dispatch('modifyDjbhItem', this.$store.getters.djbhItem)
       this.$store.dispatch('modifyTypeDjbh', this.type_djbh)
       this.$store.dispatch('modifyPathStatus', 'listHead')
@@ -85,14 +84,12 @@ export default {
       })
     },
     goFlowBody () {
-      console.log('goFlowBody')
       let params = {
         flowId: this.djItem.FLOW_ID,
         objGuid: this.djItem.OBJ_GUID,
         empNum: this.$store.getters.missionEmpNum,
         bizDJBH: this.djItem.DJBH
       }
-      console.log(params)
       this.$router.push({
         path: '/flowDetails',
         query: {
@@ -102,7 +99,6 @@ export default {
       this.$store.dispatch('modifyPathStatus', 'listHead')
     },
     goFetchBody () {
-      console.log('goFetchBody')
       let url = '/process/reTakeTaskData'
       let params = {
         bizDate: this.djItem.TIME,
@@ -122,7 +118,6 @@ export default {
       let data = {
         'requestBody': JSON.stringify(params)
       }
-      console.log(JSON.stringify(params))
       this.$messagebox({
         title: '提示',
         message: '确定取回单据?',
@@ -130,11 +125,8 @@ export default {
         showConfirmButton: true
       }).then(action => {
         if (action === 'confirm') {
-          // console.log('action=====' + action)
           this.$http.post(url, data).then((val) => {
-            console.log('_______________________')
             console.log(val.data)
-            console.log('_______________________')
           })
         } else {
           console.log('action=====' + action)
