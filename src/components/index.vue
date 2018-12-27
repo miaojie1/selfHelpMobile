@@ -16,7 +16,6 @@
             <mt-badge size="small" color="red" v-else>{{todoCount}}</mt-badge>
           </div>
           <div class="index-item-pic">
-            <!-- <img src="@/assets/wodedaiban.png"/> -->
             <img src="@/assets/index-daiban.png"/>
           </div>
           <div class="index-item-title">

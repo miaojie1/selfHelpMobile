@@ -20,7 +20,7 @@
       <no-data></no-data>
     </div> -->
     <div class="noDataDiv" v-if="content === '' || content === null">
-      <img src="@/assets/zanwu.png">
+      <img src="@/assets/none.png">
       <p>暂时没有数据哦~</p>
     </div>
     <div v-else class="wage_body_content">
