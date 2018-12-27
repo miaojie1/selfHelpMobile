@@ -1,8 +1,8 @@
 <template>
   <div>
     <mt-header title="内部招聘" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
       <mt-button slot="right" @click="handleApplyRecord">申请记录</mt-button>
     </mt-header>
@@ -69,8 +69,7 @@ export default {
       distanceIndex: 2,
       isApply: false,
       topDistance: 70,
-      bottomDistance: 70,
-      backUrl: ''
+      bottomDistance: 70
     }
   },
   created: function () {
@@ -182,7 +181,6 @@ export default {
       }
       this.$http.post(url, data).then((value) => {
         this.isApply = value.data.data.isApply
-        console.log('isApply===' + value.data.data.isApply)
       }).catch((val) => {
         console.log('职位列表 职位详情出错！')
       })

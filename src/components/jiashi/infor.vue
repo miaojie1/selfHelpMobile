@@ -1,10 +1,5 @@
 <template>
   <div>
-    <!-- <mt-header title="关于我们" fixed>
-      <router-link to="" slot="left">
-        <mt-button icon="back" @click="handleBack">返回</mt-button>
-      </router-link>
-    </mt-header> -->
     <div class="inforContent" ref="aboutMeContainer">
       <div class="logoContent">
         <img v-if="content.img != ''" src="content.img"/>
@@ -41,13 +36,9 @@ export default {
       let url = '/company/aboutme'
       this.$http.get(url).then((val) => {
         this.content = val.data.data
-        console.log(val.data)
       }).catch((val) => {
         console.log(val)
       })
-    },
-    handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
     },
     changeFixed (clientHeight) {
       this.$refs.aboutMeContainer.style.height = clientHeight + 'px'

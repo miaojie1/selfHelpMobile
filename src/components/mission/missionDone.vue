@@ -1,8 +1,8 @@
 <template>
   <div>
     <mt-header title="我的已办" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
     </mt-header>
     <!-- 数据加载动画 -->
@@ -40,13 +40,11 @@ export default{
       haveDoneTotalData: [],
       // 已办各类任务的具体任务数组
       haveDoneSendData: [],
-      show: true,
-      backUrl: ''
+      show: true
     }
   },
   created: function () {
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    this.backUrl = '/index?userName=' + this.missionEmpNum
     this.$store.dispatch('modifyMissionTaskType', 'processed')
     this.getHaveDoneMission()
   },

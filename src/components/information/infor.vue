@@ -1,8 +1,8 @@
 <template>
   <div class="infor-container" ref="inforContainer">
     <mt-header title="个人信息" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
     </mt-header>
     <div class="infor_header">
@@ -48,14 +48,12 @@ export default {
       key: [],
       // 暂存 个人名称的具体标题
       keyText: [],
-      backUrl: '',
       clientHeight: '',
       show: true
     }
   },
   created: function () {
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    this.backUrl = '/index?userName=' + this.$store.getters.missionEmpNum
     this.getInfor()
   },
   methods: {
@@ -78,6 +76,9 @@ export default {
     },
     changeFixed (clientHeight) {
       this.$refs.inforContainer.style.height = clientHeight + 'px'
+    },
+    handleBack () {
+      window.webkit.messageHandlers.Call.postMessage({})
     }
   },
   watch: {

@@ -1,8 +1,8 @@
 <template>
   <div class="danju-container" ref="danJuContainer">
     <mt-header title="我的单据" fixed>
-      <router-link :to="backUrl" slot="left">
-        <mt-button icon="back">返回</mt-button>
+      <router-link to="" slot="left">
+        <mt-button icon="back" @click="handleBack">返回</mt-button>
       </router-link>
     </mt-header>
     <div style="width: 100%; height: 100pt;" v-show="show">
@@ -35,16 +35,12 @@ export default {
   data () {
     return {
       danjuData: [],
-      // djbh: [],
-      isFirstEnter: false,
       show: true,
-      backUrl: '',
       clientHeight: ''
     }
   },
   created: function () {
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    this.backUrl = '/index?userName=' + this.missionEmpNum
     this.getDanjuData()
   },
   methods: {
@@ -71,6 +67,9 @@ export default {
     },
     changeFixed (clientHeight) {
       this.$refs.inforContainer.style.height = clientHeight + 'px'
+    },
+    handleBack () {
+      window.webkit.messageHandlers.Call.postMessage({})
     }
   },
   beforeMount () {

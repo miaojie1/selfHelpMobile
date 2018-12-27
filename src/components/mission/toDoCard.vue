@@ -6,7 +6,7 @@
       </router-link>
     </mt-header>
     <div class="todo_card_body">
-      <div v-for="(n, index) in rows" :key="index" class="todo_card" @click="handle_todo_card(n)">
+      <div v-for="(n, index) in rows" :key="index" class="todo_card">
         <div class="todo_card_content" @click="showDoneDetail(n)">
           <div class="list1">
             <img src="@/assets/a7.png"/>
@@ -89,10 +89,6 @@ export default {
     }
   },
   methods: {
-    handle_todo_card (val) {
-      console.log('点击卡片====')
-      console.log(JSON.stringify(val))
-    },
     // 点击待办卡片
     showDoneDetail (val) {
       if (this.task_type === 'pending') {

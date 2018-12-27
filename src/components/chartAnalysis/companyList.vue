@@ -424,12 +424,7 @@ export default {
       // this.chartVisible = true
     },
     handleBack () {
-      this.$router.push({
-        path: '/index',
-        query: {
-          userName: window.localStorage.getItem('empNum')
-        }
-      })
+      window.webkit.messageHandlers.Call.postMessage({})
     },
     goToDepart (value) {
       this.searchValue = ''

@@ -33,7 +33,6 @@ export default {
     }
   },
   created: function () {
-    console.log('我的申请记录' + this.missionEmpNum)
     this.getMyApply()
     this.backUrl = '/recruit?userName=' + this.missionEmpNum
   },
@@ -47,9 +46,7 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getMyApply, data).then((value) => {
-        console.log(value.data.data)
         this.applyData = value.data.data
-        console.log('我的申请：' + this.applyData.length)
       })
     },
     handleItem (id) {
