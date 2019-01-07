@@ -23,7 +23,7 @@
         </li>
       </ul>
     </div>
-    <!-- 页面的遮罩层 -->
+    <!--页面的遮罩层 -->
     <div id="cover" v-show="isShow" @click="closeList"></div>
     <div id="container" :class="{haveScroll: isShow}">
       <mt-search
@@ -32,24 +32,30 @@
         cancel-text="取消"
         placeholder="搜索">
       </mt-search>
-      <!-- 搜索框及时显示 -->
+      <!--搜索框及时显示-->
       <div id="showResults" v-show="resultsPanel" :class="{haveShow: resultsPanel}">
         <div class="resItem" v-for="(item, index) in results" :key="index" @click="goToDepart(item.label)">
           <div class="resItem-text">
             {{item.label}}
           </div>
-          <img src="@/assets/chart-circle.png" class="li-chartImg">
+          <!-- <img src="@/assets/chart-circle.png" class="li-chartImg"> -->
         </div>
       </div>
       <div class="departContainer">
         <ul v-for="(depart, index) in companyList1" :key="index">
-          <div class="ul-title" @click="goToDepart(depart.label)">
+          <div class="ul-title" @click="goToDepart(depart.depart)">
             {{depart.depart}}
           </div>
           <li v-for="(item, index) in depart.emp" :key="index">
             <span>{{item.empName}}</span>
           </li>
         </ul>
+        <!-- 没有组 -->
+        <!-- <ul>
+          <li v-for="(item, index) in depart" :key="index" @click="goToDepart(item.label)">
+            <span>{{item.label}}</span>
+          </li>
+        </ul> -->
       </div>
     </div>
   </div>
@@ -91,7 +97,7 @@ export default {
         },
         {
           value: '2',
-          label: '油气事业部'
+          label: '产品研发部'
         },
         {
           value: '3',
@@ -111,7 +117,7 @@ export default {
       showCompanyList: '',
       companyList1: [
         {
-          depart: 'HR事业部1',
+          depart: 'HR事业部',
           departId: '1',
           index: 'HR',
           emp: [
@@ -134,7 +140,7 @@ export default {
           ]
         },
         {
-          depart: '产品研发部',
+          depart: '石油事业部',
           departId: '2',
           index: '产品',
           emp: [
@@ -157,7 +163,7 @@ export default {
           ]
         },
         {
-          depart: '石油事业部',
+          depart: '产品研发部',
           departId: '3',
           index: '石油',
           emp: [
@@ -180,7 +186,7 @@ export default {
           ]
         },
         {
-          depart: '测试研发部',
+          depart: '平台研发部',
           departId: '4',
           index: '测试',
           emp: [
@@ -401,6 +407,7 @@ export default {
       if (typeof value === 'string') {
         this.isShow = false
         this.selectValue = value
+        this.$store.dispatch('modifyCompany', value)
         if (id === '1') {
           this.showCompanyList = this.companyList1
         } else if (id === '2') {
@@ -418,10 +425,11 @@ export default {
       console.log('点击部门' + value)
     },
     showChart () {
+      this.$store.dispatch('modifyCompany', this.selectValue)
+      this.$store.dispatch('modifyChartTitle', this.$store.getters.company + '图表分析')
       this.$router.push({
         path: '/chartList'
       })
-      // this.chartVisible = true
     },
     handleBack () {
       window.webkit.messageHandlers.Call.postMessage({})
@@ -429,6 +437,8 @@ export default {
     goToDepart (value) {
       this.searchValue = ''
       this.resultsPanel = false
+      this.$store.dispatch('modifyDepart', value)
+      this.$store.dispatch('modifyChartTitle', this.$store.getters.depart + '图表分析')
       this.$router.push({
         path: '/chartList'
       })
@@ -445,12 +455,10 @@ export default {
       } else {
         var reg = new RegExp(value)
         this.depart.forEach(element => {
-          // this.$pinyin.match(element, value)
           if (reg.test(element.label)) {
             this.results.push(element)
             this.resultsPanel = true
           }
-          // console.log(this.$pinyin.pinyin(value))
         })
       }
     },
@@ -637,27 +645,37 @@ select {
   width: 100%;
   height: 100%;;
 }
-.chartField {
-  position: fixed;
-  bottom: 0pt;
-  width: 100%;
-  height: 20pt;
-  background-color: #465295
-}
 .mint-search {
-  height: 40px !important;
+  height: 44pt !important;
   z-index: 100 !important;
-  padding-top: 48pt !important;
+  padding-top: 47pt !important;
   overflow: hidden;
   .mint-searchbar-inner {
-    height: 16pt;
+    height: 18pt;
+    border-radius: 5pt;
+    background: #7986B7 !important;
+  }
+  .mint-searchbar-core {
+    background: #7986B7 !important;
+    color: #FFFFFF;
+    padding-left: 5pt;
   }
   .mint-searchbar {
+    height: 44pt;
     padding: 4px 6px;
+    background-color: #465295;
   }
   .mint-searchbar-cancel {
-    color: white;
+    color: #FFFFFF;
     font-size: 10pt;
+  }
+  .mint-searchbar-inner .mintui-search {
+    color: #FFFFFF;
+  }
+  input::-webkit-input-placeholder {
+    padding-left: 5pt;
+    color: #FFFFFF;
+    font-size: 11pt;
   }
 }
 .mint-indexlist {
@@ -682,19 +700,14 @@ select {
   position: relative !important;
 }
 .resItem {
-  width: 99%;
+  width: 100%;
   height: 30pt;
   background: #f7f5f4;
   float: left;
-  height: 100%;
-  padding-top: 10pt;
   .resItem-text {
     width: 30%;
+    line-height: 30pt;
     float: left;
-  }
-  img {
-    width: 10%;
-    float: right;
   }
 }
 .departContainer {
@@ -706,8 +719,8 @@ select {
     padding: 0pt;
     .ul-title {
       width: 100%;
-      height: 28pt;
-      line-height: 28pt;
+      height: 24pt;
+      line-height: 24pt;
       text-align: left;
       background: #EBEBEB;
       padding-left: 10pt;

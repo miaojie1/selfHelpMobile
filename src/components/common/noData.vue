@@ -15,15 +15,16 @@ export default {
 <style lang="less">
 .noDataDiv {
   width: 100%;
-  height: 50%;
+  height: 200pt;
   margin: 0 auto;
-  margin-top: 50pt !important;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  // margin-top: 50pt !important;
   img {
     width: 60% !important;
-    margin-top: 45pt;
   }
   p {
-    margin-top: -10pt;
     font-size: 11pt;
   }
 }

@@ -46,7 +46,19 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getMyApply, data).then((value) => {
-        this.applyData = value.data.data
+        if (value.data.code === 200) {
+          this.applyData = value.data.data
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: value.data.msg
+          })
+        }
+      }).catch((err) => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     handleItem (id) {
@@ -95,8 +107,8 @@ body {
     float: right;
     padding-top: 16pt;
     img {
-      width: 15pt;
-      height: 15pt;
+      width: 11pt;
+      height: 11pt;
     }
   }
 }
@@ -111,19 +123,5 @@ body {
   font-weight: 400;
   line-height: 20pt;
   margin: 0px;
-}
-.noDataDiv {
-  width: 100%;
-  height: 50%;
-  margin: 0 auto;
-  img {
-    width: 30%;
-    height: 30%;
-    margin-top: 20pt;
-  }
-  p {
-    margin-top: -10pt;
-    font-size: 11pt;
-  }
 }
 </style>

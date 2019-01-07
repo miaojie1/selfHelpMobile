@@ -118,10 +118,20 @@ export default {
         'requestBody': JSON.stringify(this.data)
       }
       this.$http.post(detailUrl, data1).then((val) => {
-        this.flowRows = val.data.data.rowSetArray
+        if (val.data.code === 200) {
+          this.flowRows = val.data.data.rowSetArray
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
+        }
         this.show = false
       }).catch((val) => {
-        console.log(val.data)
+        this.$messagebox({
+          title: '错误',
+          message: val.data
+        })
       })
     },
     changeFixed (clientHeight) {
@@ -149,7 +159,7 @@ export default {
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
     // 减去页面上固定高度height
-    this.clientHeight = h - 64
+    this.clientHeight = h
   },
   watch: {
     clientHeight: function () {

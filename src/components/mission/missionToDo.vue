@@ -63,7 +63,6 @@ export default{
     },
     // 获取待办任务详情
     getToDoMission () {
-      let _this = this
       let getToDoMissionurl = '/process/TodoList'
       let param = {
         empNum: this.$store.getters.missionEmpNum,
@@ -73,10 +72,21 @@ export default{
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getToDoMissionurl, data).then((val) => {
-        _this.toDoTotalData = val.data.data.rowSetArray
+        if (val.data.code === 200) {
+          this.toDoTotalData = val.data.data.rowSetArray
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
+        }
         this.show = false
       }).catch((val) => {
-        alert('获取信息，出现错误')
+        this.$messagebox({
+          title: '错误',
+          message: val.data
+        })
+        this.show = false
       })
     },
     handleBack () {
@@ -138,8 +148,8 @@ export default{
       float: right;
       img {
         padding-top: 14pt;
-        width: 13pt;
-        height: 13pt;
+        width: 11pt;
+        height: 11pt;
       }
     }
   }
@@ -148,19 +158,19 @@ export default{
     height: 30pt;
     float: left;
   }
-  .noDataDiv {
-    width: 100%;
-    height: 50%;
-    margin: 0 auto;
-    margin-top: 50pt;
-    img {
-      width: 62%;
-      height: 30%;
-      margin-top: 45pt;
-    }
-    p {
-      margin-top: -10pt;
-      font-size: 11pt;
-    }
-  }
+  // .noDataDiv {
+  //   width: 100%;
+  //   height: 50%;
+  //   margin: 0 auto;
+  //   margin-top: 50pt;
+  //   img {
+  //     width: 62%;
+  //     height: 30%;
+  //     margin-top: 45pt;
+  //   }
+  //   p {
+  //     margin-top: -10pt;
+  //     font-size: 11pt;
+  //   }
+  // }
 </style>

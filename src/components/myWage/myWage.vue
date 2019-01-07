@@ -6,9 +6,9 @@
       </router-link>
     </mt-header>
     <div class="wage_header_content">
-      <img src="@/assets/a20.png" />
       <span class="wage_name_span">{{username}}</span>
-      <span class="wage_part_span">{{userPart}}</span>
+      <span v-if="userPart === '' || userPart === null" class="wage_part_span">暂无部门信息</span>
+      <span v-else class="wage_part_span">{{userPart}}</span>
     </div>
     <div class="wage_date_div">
       <span @click="openDatePicker">
@@ -16,9 +16,6 @@
       </span>
       <img src="@/assets/g3.png" @click="openDatePicker"/>
     </div>
-    <!-- <div  v-if="content === '' || content === null">
-      <no-data></no-data>
-    </div> -->
     <div class="noDataDiv" v-if="content === '' || content === null">
       <img src="@/assets/none.png">
       <p>暂时没有数据哦~</p>
@@ -190,12 +187,24 @@ export default{
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(wageUrl, data).then((val) => {
-        if (typeof (val.data.data.allMoney) !== 'undefined') {
-          this.wageValue[i] = val.data.data.allMoney
+        if (val.data.code === 200) {
+          if (typeof (val.data.data.allMoney) !== 'undefined') {
+            this.wageValue[i] = val.data.data.allMoney
+          } else {
+            this.wageValue[i] = 0
+          }
+          this.drawLine()
         } else {
-          this.wageValue[i] = 0
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
         }
-        this.drawLine()
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     // 获取工资，格式化成3个数组，方便解析显示
@@ -328,26 +337,38 @@ export default{
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(wageUrl, data).then((val) => {
-        val.data.data.content.map(function (item) {
-          if (JSON.stringify(item) !== '{}') {
-            _this.content.push(item)
-          }
-        })
-        val.data.data.contentKey.map(function (item) {
-          if (JSON.stringify(item) !== '[]') {
-            _this.contentKey.push(item)
-          }
-        })
-        this.wageLength = this.content.length
-        if (this.wageLength === 0 || JSON.stringify(this.content[0]) === '{}') {
-          this.isShow = false
-          if (this.wageLength > 0) {
+        if (val.data.code === 200) {
+          val.data.data.content.map(function (item) {
+            if (JSON.stringify(item) !== '{}') {
+              _this.content.push(item)
+            }
+          })
+          val.data.data.contentKey.map(function (item) {
+            if (JSON.stringify(item) !== '[]') {
+              _this.contentKey.push(item)
+            }
+          })
+          this.wageLength = this.content.length
+          if (this.wageLength === 0 || JSON.stringify(this.content[0]) === '{}') {
+            this.isShow = false
+            if (this.wageLength > 0) {
+              this.isShow = true
+            }
+          } else {
             this.isShow = true
           }
+          this.setWage()
         } else {
-          this.isShow = true
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
         }
-        this.setWage()
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.date
+        })
       })
     },
     // 获取用户姓名以及部门信息
@@ -360,8 +381,20 @@ export default{
         'requestBody': JSON.stringify(params)
       }
       this.$http.post(getInforUrl, data).then((val) => {
-        this.username = val.data.data.content.H_HU_NAME
-        this.userPart = val.data.data.content.H_OR_BMMC
+        if (val.data.code === 200) {
+          this.username = val.data.data.content.H_HU_NAME
+          this.userPart = val.data.data.content.H_OR_BMMC
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
+        }
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     handleBack () {
@@ -386,18 +419,12 @@ export default{
   }
   .wage_header_content{
     width: 100%;
-    height: 200pt;
+    height: 100pt;
     background-color: #465295;
-    margin-top: 27px;
+    margin-top: 55px;
     display: flex;
     flex-flow: column;
     color: #FFFFFF;
-  }
-  .wage_header_content img{
-    width: 64pt;
-    height: 64pt;
-    margin: 0 auto;
-    padding-top: 38pt;
   }
   .wage_header_content span{
     width: 100%;
@@ -410,7 +437,7 @@ export default{
   .wage_part_span{
     padding-top: 10pt;
     font-size: 11pt;
-    line-height: 16pt;
+    line-height: 19pt;
   }
   .wage_date_div{
     background-color: #FFFFFF;
@@ -477,14 +504,18 @@ export default{
     margin-left: -3%;
   }
   .wage_card_bottom{
+    width: 100%;
     background-color:#FFFFFF;
     margin: 0 auto;
     margin-bottom: 20pt;
   }
   .noDataDiv-wage {
     width: 100%;
-    height: 50%;
+    height: 200pt;
     margin: 0 auto;
+    // position: absolute;
+    // top: 50%;
+    // transform: translate(0, -50%);
     background-color:#F8F8F8;
     img {
       width: 65%;

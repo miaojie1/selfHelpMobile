@@ -49,10 +49,17 @@ export default {
       }, {
         name: '显示单据',
         method: this.goListBody
-      }, {
-        name: '取回单据',
-        method: this.goFetchBody
       }],
+      // actions: [{
+      //   name: '显示流程',
+      //   method: this.goFlowBody
+      // }, {
+      //   name: '显示单据',
+      //   method: this.goListBody
+      // }, {
+      //   name: '取回单据',
+      //   method: this.goFetchBody
+      // }],
       isFirstEnter: false
     }
   },
@@ -182,30 +189,30 @@ body {
       width: 70%;
       height: 40pt;
       float: left;
-      padding-top: 3pt;
+      padding-top: 3pt !important;
       .danju_head_bianhao {
         width: 57%;
         height: 20pt;
-        margin-left: -3pt;
+        margin-left: -3pt !important;
         float: left;
         color: #4f578a;
       }
       .danju_head_note {
         width: 24%;
-        height: 18pt;
+        height: 18pt !important;
         font-size: 10pt;
         float: left;
-        margin-top: -1pt;
-        margin-left: 22pt;
-        padding-top: 0pt;
+        margin-top: -1pt !important;
+        margin-left: 22pt !important;
+        padding-top: 0pt !important;
         color: #8a8a8a;
       }
       .danju_head_time {
         width: 59%;
         height: 18pt;
         float: left;
-        margin-left: -11pt;
-        font-size: 10pt;
+        margin-left: -11pt !important;
+        font-size: 10pt !important;
         color: #8a8a8a;
       }
     }

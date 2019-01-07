@@ -11,3 +11,6 @@ export const missionFlowDetail = state => state.missionFlowDetail
 export const pathStatus = state => state.pathStatus
 export const flowData = state => state.flowData
 export const missionTitle = state => state.missionTitle
+export const depart = state => state.depart
+export const company = state => state.company
+export const chartTitle = state => state.chartTitle

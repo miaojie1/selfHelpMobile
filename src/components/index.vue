@@ -93,7 +93,6 @@ export default {
     this.userName = this.$route.query.userName
     window.localStorage.setItem('empNum', this.userName)
     this.getToDoData()
-    this.getDanjuData()
   },
   watch: {
     toDoTotalData: function (newData, oldData) {
@@ -184,26 +183,19 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getToDoMissionurl, data).then((val) => {
-        this.toDoTotalData = val.data.data.rowSetArray
+        if (val.data.code === 200) {
+          this.toDoTotalData = val.data.data.rowSetArray
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
+        }
       }).catch((val) => {
-        alert('获取信息，出现错误')
-      })
-      // var i = this.toDoTotalData.map(function (item) {
-      //   for (var i in item.rows) {
-      //     return i++
-      //   }
-      // })
-    },
-    getDanjuData () {
-      let url = '/process/myInvoices'
-      let params = {
-        empNum: this.userName
-      }
-      let data = {
-        'requestBody': JSON.stringify(params)
-      }
-      this.$http.post(url, data).then((val) => {
-        this.danJuTotalData = val.data.data.data
+        this.$messagebox({
+          title: '错误',
+          message: val.data
+        })
       })
     },
     changeFixed (clientHeight) {
@@ -213,7 +205,7 @@ export default {
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
     // 减去页面上固定高度height
-    this.clientHeight = h - 70
+    this.clientHeight = h
   }
 }
 </script>

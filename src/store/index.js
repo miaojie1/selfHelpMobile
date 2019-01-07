@@ -20,7 +20,14 @@ const state = {
   missionEmpNum: '',
   missionFlowDetail: '',
   pathStatus: '',
-  flowData: ''
+  flowData: '',
+  // 图表分析 所在的部门 公司
+  depart: '',
+  company: '',
+  chartTitle: '',
+  // 图表分析 所有公司，部门
+  allCompany: '',
+  allDepart: ''
 }
 // 注册上面引入的各大模块
 const store = new Vuex.Store({

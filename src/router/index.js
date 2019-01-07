@@ -1,14 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MintUI from 'mint-ui'
-import 'mint-ui/lib/style.css'
-import HttpUtil from '@/common/HttpUtil.js'
 Vue.use(Router)
-Vue.use(MintUI)
-Vue.config.productionTip = false
-Vue.prototype.$http = HttpUtil
 export default new Router({
   base: '/selfHelpVue',
+  // 去掉url中的#
+  // mode: 'history',
   routes: [
     {
       path: '/index',
@@ -43,11 +39,6 @@ export default new Router({
     {
       path: '/danju',
       name: 'DanJu',
-      meta: {
-        keepAlive: true, // 该字段表示该页面需要缓存
-        isBack: false, // 用于判断上一个页面是哪个
-        title: 'DanJuListHead'
-      },
       component: resolve => require(['@/components/mission/danju/danju'], resolve) // 路由懒加载
       // component: () => import('@/components/mission/danju/danju')
     },

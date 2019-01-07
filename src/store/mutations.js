@@ -35,3 +35,21 @@ export const modifyPathStatus = (state, val) => {
 export const modifyFlowData = (state, val) => {
   state.content = val
 }
+export const modifyDepart = (state, val) => {
+  state.depart = val
+}
+export const modifyCompany = (state, val) => {
+  state.company = val
+}
+export const modifyChartTitle = (state, val) => {
+  state.chartTitle = val
+}
+export const back = (state, val) => {
+  if (val === 'isAn') {
+    alert(val)
+    window.webkit.messageHandlers.Call.postMessage({})
+  } else if (val === 'isIos') {
+    alert(val)
+    window.webkit.messageHandlers.Call.postMessage({})
+  }
+}

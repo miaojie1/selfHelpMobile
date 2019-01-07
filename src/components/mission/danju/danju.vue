@@ -10,7 +10,7 @@
         <mt-spinner :size="30" type="fading-circle" style="margin:0 auto;"></mt-spinner>
       </div>
     </div>
-    <div  v-if="danjuData.length === 0 && show === false">
+    <div v-if="danjuData.length === 0 && show === false">
       <no-data title='单据'></no-data>
     </div>
     <div class="danju_listContent" v-else>
@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from 'vuex'
 import noData from '@/components/common/noData'
 export default {
   data () {
@@ -60,8 +60,22 @@ export default {
       let data = {
         'requestBody': JSON.stringify(params)
       }
-      this.$http.post(url, data).then((val) => {
-        this.danjuData = val.data.data.data
+      this.$http.post(url, data, this).then((val) => {
+        if (val.data.code === 200) {
+          this.danjuData = val.data.data.data
+          this.show = false
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.code
+          })
+          this.show = false
+        }
+      }).catch((err) => {
+        this.$messagebox({
+          title: '错误',
+          message: err
+        })
         this.show = false
       })
     },
@@ -69,13 +83,13 @@ export default {
       this.$refs.inforContainer.style.height = clientHeight + 'px'
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
     // 减去页面上固定高度height
-    this.clientHeight = h - 70
+    this.clientHeight = h
   },
   watch: {
     clientHeight: function () {
@@ -148,21 +162,6 @@ export default {
     width: 100%;
     height: 30pt;
     float: left;
-  }
-  .noDataDiv {
-    width: 100%;
-    height: 50%;
-    margin: 0 auto;
-    margin-top: 50pt;
-    img {
-      width: 30%;
-      height: 30%;
-      margin-top: 20pt;
-    }
-    p {
-      margin-top: -10pt;
-      font-size: 11pt
-    }
   }
   .mint-indicator-wrapper {
     background-color: rgb(243, 243, 243)

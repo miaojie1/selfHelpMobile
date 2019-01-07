@@ -189,14 +189,17 @@ export default {
             duration: 3000
           })
           this.refrashData()
-        } else if (val.data.code === 500) {
-          let msg = val.data.msg
+        } else {
           this.$messagebox({
-            title: '提示',
-            message: msg,
-            showCancelButton: true
+            title: '错误',
+            message: val.data.msg
           })
         }
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     // 重新加载获取流程信息，更新页面
@@ -210,25 +213,37 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getToDoMissionurl, data).then((val) => {
-        // 用于判断是当前类别的待办任务的数量，重新请求后，若该类别还有待办任务，则重新赋值，反之到待办列表界面
-        var res = 0
-        // 保存待办任务列表
-        let tempData = val.data.data.rowSetArray
-        tempData.forEach(element => {
-          let index = element.flow_id
-          if (index === this.flow_id) {
-            this.rows = element.rows
-            res = res + 1
-          }
-        })
-        if (res === 0) {
-          this.$router.push({
-            path: '/missionToDo',
-            query: {
-              userName: this.missionEmpNum
+        if (val.data.code === 200) {
+          // 用于判断是当前类别的待办任务的数量，重新请求后，若该类别还有待办任务，则重新赋值，反之到待办列表界面
+          var res = 0
+          // 保存待办任务列表
+          let tempData = val.data.data.rowSetArray
+          tempData.forEach(element => {
+            let index = element.flow_id
+            if (index === this.flow_id) {
+              this.rows = element.rows
+              res = res + 1
             }
           })
+          if (res === 0) {
+            this.$router.push({
+              path: '/missionToDo',
+              query: {
+                userName: this.missionEmpNum
+              }
+            })
+          }
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
         }
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     // 显示流程

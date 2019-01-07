@@ -16,7 +16,7 @@
             {{currentYear}}
           </div>
           <div class="catagray-item-img" @click="handleYear">
-            <img src="@/assets/select.png">
+            <img src="@/assets/select1.png">
           </div>
         </div>
         <div class="catagray-item">
@@ -27,7 +27,7 @@
             {{currentCompany}}
           </div>
           <div class="catagray-item-img" @click="handleCompany">
-            <img src="@/assets/select.png">
+            <img src="@/assets/select1.png">
           </div>
         </div>
         <div class="catagray-item">
@@ -38,7 +38,7 @@
             {{currentDepart}}
           </div>
           <div class="catagray-item-img" @click="handlePart">
-            <img src="@/assets/select.png">
+            <img src="@/assets/select1.png">
           </div>
         </div>
       </div>
@@ -71,9 +71,12 @@ export default {
     return {
       // 头部标题
       title: '',
+      // 返回的url
       backUrl: '',
       clientHeight: '',
+      // 判断当前是那种比例图，薪资/性别···
       type: '',
+      // 下部弹框
       popupYearVisible: false,
       popupCompanyVisible: false,
       popupDepartVisible: false,
@@ -81,8 +84,10 @@ export default {
       currentYear: '',
       selectCompany: [],
       currentCompany: '',
+      defaultCompanyIndex: '',
       selectDepart: [],
       currentDepart: '',
+      defaultDepartIndex: '',
       renyuanDataList: [20, 40, 60, 10, 70, 30],
       renyuanData: [
         {value: 80, name: '开发'},
@@ -121,18 +126,9 @@ export default {
       let data = [
         {
           flex: 1,
-          values: ['当前年份'],
-          className: 'slot1',
-          textAlign: 'right'
-        }, {
-          divider: true,
-          content: '-',
-          className: 'slot2'
-        }, {
-          flex: 1,
           values: this.selectYears,
           className: 'slot1',
-          textAlign: 'left'
+          textAlign: 'center'
         }
       ]
       return data
@@ -141,18 +137,10 @@ export default {
       let data = [
         {
           flex: 1,
-          values: ['当前公司'],
-          className: 'slot1',
-          textAlign: 'right'
-        }, {
-          divider: true,
-          content: '-',
-          className: 'slot2'
-        }, {
-          flex: 1,
           values: this.selectCompany,
+          defaultIndex: this.defaultCompanyIndex,
           className: 'slot1',
-          textAlign: 'left'
+          textAlign: 'center'
         }
       ]
       return data
@@ -161,24 +149,17 @@ export default {
       let data = [
         {
           flex: 1,
-          values: ['当前部门'],
-          className: 'slot1',
-          textAlign: 'right'
-        }, {
-          divider: true,
-          content: '-',
-          className: 'slot2'
-        }, {
-          flex: 1,
           values: this.selectDepart,
+          defaultIndex: this.defaultDepartIndex,
           className: 'slot1',
-          textAlign: 'left'
+          textAlign: 'center'
         }
       ]
       return data
     }
   },
   methods: {
+    // 人员比例图
     drawRenYuan () {
       let chart = echarts.init(document.getElementById('chart'))
       var option = {
@@ -219,9 +200,6 @@ export default {
           }
         },
         legend: {
-          // orient: 'vertical',
-          // x: 'center',
-          // y: 'bottom',
           data: ['开发', '测试', '方案', '设计', '销售', '实施']
         },
         color: function (value) {
@@ -262,6 +240,7 @@ export default {
       }
       chart.setOption(option)
     },
+    // 性别比例图
     drawXingBie () {
       let chart = echarts.init(document.getElementById('chart'))
       var option = {
@@ -274,9 +253,8 @@ export default {
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
         legend: {
-          orient: 'vertical',
-          x: 'left'
-          // data: ['男', '女'] // 要跟series里面的data name相同
+          x: 'center',
+          y: 'bottom'
         },
         toolbox: {
           show: true,
@@ -314,7 +292,8 @@ export default {
             name: '男女比例',
             type: 'pie',
             radius: '55%',
-            center: ['50%', '50%'],
+            // radius: ['30%', '60%'],
+            center: ['50%', '55%'],
             data: [
               {value: 650, name: '男'},
               {value: 259, name: '女'}
@@ -327,6 +306,7 @@ export default {
       }
       chart.setOption(option)
     },
+    // 学历比例图
     drawXueLi () {
       let chart = echarts.init(document.getElementById('chart'))
       var option = {
@@ -371,34 +351,14 @@ export default {
         },
         // color: ['rgb(236, 112, 107)', 'rgb(236, 112, 107)', 'rgb(198, 53, 49)', 'rgb(167, 45, 41)'],
         color: function (value) {
-          // alert(value)
           return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
         },
         series: [{
           name: '学历比例',
           type: 'pie',
-          radius: '60%',
+          radius: ['30%', '60%'],
           center: ['50%', '50%'],
           data: this.xueliData.sort(function (a, b) { return a.value - b.value }),
-          roseType: 'radius',
-          // label: {
-          //   normal: {
-          //     textStyle: {
-          //       color: 'rgba(255, 255, 255, 0.3)'
-          //     }
-          //   }
-          // },
-          // labelLine: {
-          //   normal: {
-          //     lineStyle: {
-          //       color: 'rgba(255, 255, 255, 0.3)'
-          //     },
-          //     smooth: 0.2,
-          //     length: 10,
-          //     length2: 20
-          //   }
-          // },
-          // color: ['rgb(236, 112, 107)', 'rgb(236, 112, 107)', 'rgb(198, 53, 49)', 'rgb(167, 45, 41)'],
           animationType: 'scale',
           animationEasing: 'elasticOut',
           animationDelay: function (idx) {
@@ -408,6 +368,7 @@ export default {
       }
       chart.setOption(option)
     },
+    // 薪资比例图
     drawXinZi () {
       let chart = echarts.init(document.getElementById('chart'))
       var option = {
@@ -453,32 +414,14 @@ export default {
         series: [{
           name: '薪资比例',
           type: 'pie',
-          radius: '60%',
+          radius: ['30%', '60%'],
           center: ['50%', '50%'],
           data: this.xinziData.sort(function (a, b) { return a.value - b.value }),
-          roseType: 'radius',
-          // color: ['rgb(215, 102, 98)', 'rgb(159, 43, 40)', 'rgb(138, 37, 34)', 'rgb(138, 37, 34)', 'rgb(115, 25, 22)'],
+          // 南丁格尔玫瑰图
+          // roseType: 'radius',
           color: function (value) {
-            // alert(value)
             return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
           },
-          // label: {
-          //   normal: {
-          //     textStyle: {
-          //       color: 'rgba(255, 255, 255, 0.3)'
-          //     }
-          //   }
-          // },
-          // labelLine: {
-          //   normal: {
-          //     lineStyle: {
-          //       color: 'rgba(255, 255, 255, 0.3)'
-          //     },
-          //     smooth: 0.2,
-          //     length: 10,
-          //     length2: 20
-          //   }
-          // },
           animationType: 'scale',
           animationEasing: 'elasticOut',
           animationDelay: function (idx) {
@@ -497,6 +440,7 @@ export default {
     handlePart () {
       this.popupDepartVisible = true
     },
+    // 设置当前屏幕的高度 并绘制比例图
     changeFixed (clientHeight) {
       this.$refs.panel.style.height = clientHeight + 'px'
       this.$refs.chart.style.height = (clientHeight * 0.6) + 'px'
@@ -520,12 +464,33 @@ export default {
       return this.selectYears
     },
     setCompany () {
-      this.currentCompany = '普联软件股份有限公司'
-      this.selectCompany = ['普联软件股份有限公司', '子公司一', '子公司二']
+      this.currentCompany = this.$store.getters.company
+      this.selectCompany = ['普联软件股份有限公司', '分公司一', '分公司二']
+      this.selectCompany.forEach((element, index) => {
+        if (element === this.currentCompany) {
+          this.defaultCompanyIndex = index
+        }
+      })
+      if (this.defaultCompanyIndex === '') {
+        this.defaultCompanyIndex = -1
+      }
     },
     setdepart () {
-      this.currentDepart = 'HR事业部'
-      this.selectDepart = ['HR事业部', '石油事业部', '平台研发部', '政务事业部']
+      this.currentDepart = this.$store.getters.depart
+      this.selectDepart = ['HR事业部', '石油事业部', '平台研发部', '政务事业部', '整体']
+      if (this.$store.getters.depart === '') {
+        this.currentDepart = '整体'
+        this.defaultDepartIndex = 4
+      } else {
+        this.selectDepart.forEach((element, index) => {
+          if (element === this.currentDepart) {
+            this.defaultDepartIndex = index
+          }
+        })
+        if (this.defaultDepartIndex === '') {
+          this.defaultDepartIndex = -1
+        }
+      }
     },
     handleConfirm () {
       this.popupYearVisible = false
@@ -534,13 +499,13 @@ export default {
       this.popupYearVisible = false
     },
     onYearChange (picker, values) {
-      this.currentYear = values[1]
+      this.currentYear = values[0]
     },
     onCompanyChange (picker, values) {
-      this.currentCompany = values[1]
+      this.currentCompany = values[0]
     },
     onDepartChange (picker, values) {
-      this.currentDepart = values[1]
+      this.currentDepart = values[0]
     }
   },
   beforeMount () {
@@ -576,13 +541,12 @@ export default {
     padding-left: 10pt;
     padding-top: 12pt;
     font-size: 11pt;
-    color: #8C8C8C
+    color: #98A1AB
   }
   .catagray-item-value {
-    width: 50%;
+    width: 55%;
     float: left;
     text-align: right;
-    // padding-right: 10pt;
     padding-top: 12pt;
     font-size: 11pt;
     color: #282828;
@@ -592,10 +556,11 @@ export default {
   }
   .catagray-item-img {
     width: 9%;
+    height: 100%;
     float: right;
     img {
-      width: 13pt;
-      margin-top: 12pt;
+      width: 10pt;
+      margin-top: 16pt;
       margin-left: 0pt;
       color: #282828
     }

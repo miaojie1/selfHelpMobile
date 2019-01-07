@@ -6,7 +6,6 @@
       </router-link>
     </mt-header>
     <div class="infor_header">
-      <img src="@/assets/a20.png"/>
       <span>{{content.H_HU_NAME}}</span>
     </div>
     <!-- 加载动画 -->
@@ -49,6 +48,7 @@ export default {
       // 暂存 个人名称的具体标题
       keyText: [],
       clientHeight: '',
+      // 加载框是否显示
       show: true
     }
   },
@@ -57,6 +57,7 @@ export default {
     this.getInfor()
   },
   methods: {
+    // 获取个人信息
     getInfor () {
       let _this = this
       let getInforUrl = '/personal/info'
@@ -67,11 +68,21 @@ export default {
         'requestBody': JSON.stringify(params)
       }
       this.$http.post(getInforUrl, data).then((val) => {
-        this.content = val.data.data.content
-        this.contentKey = val.data.data.contentKey
-        setTimeout(function () {
+        if (val.data.code === 200) {
+          this.content = val.data.data.content
+          this.contentKey = val.data.data.contentKey
+          setTimeout(function () {
+            _this.show = false
+          }, 100)
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
           _this.show = false
-        }, 100)
+        }
+      }).catch(err => {
+        this.$messagebox(err)
       })
     },
     changeFixed (clientHeight) {
@@ -89,7 +100,7 @@ export default {
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
     // 减去页面上固定高度height
-    this.clientHeight = h - 70
+    this.clientHeight = h
   },
   components: {
     noData
@@ -108,16 +119,10 @@ body {
 .infor_header {
   background-color: #465295;
   width: 100%;
-  height: 180pt;
+  height: 83pt;
   margin-top: 43pt;
   display: flex;
   flex-flow: column;
-  img {
-    height: 65pt;
-    width: 65pt;
-    margin: 0 auto;
-    margin-top: 25pt;
-  }
   span {
     margin-top: 18pt;
     color: #F8F8F8;
@@ -162,18 +167,18 @@ body {
   font-size: 11pt;
   padding-top: 9pt;
 }
-.noDataDiv {
-  width: 100%;
-  height: 50%;
-  margin: 0 auto;
-  img {
-    width: 30%;
-    height: 30%;
-    margin-top: 20pt;
-  }
-  p {
-    margin-top: -10pt;
-    font-size: 11pt;
-  }
-}
+// .noDataDiv {
+//   width: 100%;
+//   height: 50%;
+//   margin: 0 auto;
+//   img {
+//     width: 30%;
+//     height: 30%;
+//     margin-top: 20pt;
+//   }
+//   p {
+//     margin-top: -10pt;
+//     font-size: 11pt;
+//   }
+// }
 </style>

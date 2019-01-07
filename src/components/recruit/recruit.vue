@@ -27,7 +27,7 @@
             <span>{{n.H_GZDD}}&nbsp;|&nbsp;{{n.H_ZPRS}}&nbsp;|&nbsp;{{n.H_BM_ETIME}}</span>
             <p class="re_itemP2">{{n.H_ZPDW}}</p>
           </div>
-          <div class="re_content_img" v-if="n.isApply === 'false'">
+          <div class="re_content_img" v-if="n.isApply === 'faelse'">
             <img src="@/assets/right.png" />
           </div>
           <div class="apply-pic" v-else-if="n.isApply === 'true'">
@@ -95,9 +95,21 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(getPosturl, data).then((value) => {
-        _this.recruitData = value.data.data
-        _this.$refs.loadmore.onTopLoaded()
-        _this.page = 1
+        if (value.data.code === 200) {
+          _this.recruitData = value.data.data
+          _this.$refs.loadmore.onTopLoaded()
+          _this.page = 1
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: value.data.msg
+          })
+        }
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     // 单击某一职位，传递职位的id
@@ -146,12 +158,24 @@ export default {
             'requestBody': JSON.stringify(param)
           }
           this.$http.post(getPosturl, data).then((value) => {
-            _this.recruitData = _this.recruitData.concat(value.data.data)
-            window.localStorage.setItem('recruitData', JSON.stringify(_this.recruitData))
-            _this.$refs.loadmore.onBottomLoaded()
-            if (value.data.data.length < 6) {
-              _this.allLoaded = true // 若数据已全部获取完毕
+            if (value.data.code === 200) {
+              _this.recruitData = _this.recruitData.concat(value.data.data)
+              window.localStorage.setItem('recruitData', JSON.stringify(_this.recruitData))
+              _this.$refs.loadmore.onBottomLoaded()
+              if (value.data.data.length < 6) {
+                _this.allLoaded = true // 若数据已全部获取完毕
+              }
+            } else {
+              this.$messagebox({
+                title: '错误',
+                message: value.data.msg
+              })
             }
+          }).catch(err => {
+            this.$messagebox({
+              title: '错误',
+              message: err.data
+            })
           })
         } else {
           this.$refs.loadmore.onBottomLoaded()
@@ -180,9 +204,19 @@ export default {
         requestBody: JSON.stringify(params)
       }
       this.$http.post(url, data).then((value) => {
-        this.isApply = value.data.data.isApply
+        if (value.data.code === 200) {
+          this.isApply = value.data.data.isApply
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: value.data.msg
+          })
+        }
       }).catch((val) => {
-        console.log('职位列表 职位详情出错！')
+        this.$messagebox({
+          title: '错误',
+          message: val.data
+        })
       })
     },
     handleBack () {
@@ -236,16 +270,6 @@ body {
     width: 80%;
     float: left;
   }
-  .re_content_img {
-    width: 10%;
-    margin-left: 10pt;
-    float: left;
-    padding-top: 25pt;
-    img {
-      width: 14pt;
-      height: 14pt;
-    }
-  }
 }
 .re_item {
   width: 100%;
@@ -258,10 +282,20 @@ body {
     float: right;
     width: 10%;
     margin-top: 1pt;
-    margin-right: 5pt;
+    margin-right: 0pt;
     img {
       width: 18pt;
       height: 18pt;
+    }
+  }
+  .re_content_img {
+    width: 10%;
+    margin-left: 10pt;
+    float: left;
+    padding-top: 25pt;
+    img {
+      width: 11pt;
+      height: 11pt;
     }
   }
 }
@@ -281,19 +315,5 @@ body {
   font-weight: 400;
   line-height: 20pt;
   margin: 0px;
-}
-.noDataDiv {
-  width: 100%;
-  height: 50%;
-  margin: 0 auto;
-  img {
-    width: 30%;
-    height: 30%;
-    margin-top: 20pt;
-  }
-  p {
-    margin-top: -10pt;
-    font-size: 11pt;
-  }
 }
 </style>

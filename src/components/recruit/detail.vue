@@ -86,16 +86,28 @@ export default {
       'requestBody': JSON.stringify(param)
     }
     this.$http.post(postDetailUrl, data).then((val) => {
-      // 保存职位详情
-      this.detail = val.data.data
-      // 保存是否已申请字段
-      this.isApply = val.data.data.isApply
-      if (this.detail.profile === null || this.detail.profile === ' ' || this.detail.profile === '') {
-        this.isShow = false
+      if (val.data.code === 200) {
+        // 保存职位详情
+        this.detail = val.data.data
+        // 保存是否已申请字段
+        this.isApply = val.data.data.isApply
+        if (this.detail.profile === null || this.detail.profile === ' ' || this.detail.profile === '') {
+          this.isShow = false
+        } else {
+          this.isShow = true
+          _this.detail.profile = _this.transFont(_this.detail.profile)
+        }
       } else {
-        this.isShow = true
-        _this.detail.profile = _this.transFont(_this.detail.profile)
+        this.$messagebox({
+          title: '错误',
+          message: val.data.msg
+        })
       }
+    }).catch(err => {
+      this.$messagebox({
+        title: '错误',
+        message: err.data
+      })
     })
   },
   methods: {
@@ -124,7 +136,7 @@ export default {
           })
         } else {
           this.$messagebox({
-            title: '温馨提示',
+            title: '错误',
             message: msg,
             confirmButtonText: '确定'
           })
@@ -143,29 +155,35 @@ export default {
         'requestBody': JSON.stringify(param)
       }
       this.$http.post(cancelApplyUrl, data).then((val) => {
-        // 返回结果，，1为成功，2为失败
-        let result = val.data.data.result
-        if (result === '1') {
-          this.$toast({
-            message: '取消申请成功',
-            iconClass: 'icon icon-success'
-          })
-          this.$router.push({
-            path: '/myRecord'
-          })
-        } else if (result === '0') {
+        if (val.data.code === 200) {
+          // 返回结果，，1为成功，2为失败
+          let result = val.data.data.result
+          if (result === '1') {
+            this.$toast({
+              message: '取消申请成功',
+              iconClass: 'icon icon-success'
+            })
+            this.$router.push({
+              path: '/myRecord'
+            })
+          } else if (result === '0') {
+            this.$messagebox({
+              title: '错误',
+              message: '取消申请失败',
+              confirmButtonText: '确定'
+            })
+          }
+        } else {
           this.$messagebox({
-            title: '温馨提示',
-            message: '取消申请失败',
-            confirmButtonText: '确定'
-          })
-        } else if (val.data.code === 500) {
-          this.$messagebox({
-            title: '温馨提示',
-            message: val.data.msg,
-            confirmButtonText: '确定'
+            title: '错误',
+            message: val.data.msg
           })
         }
+      }).catch(err => {
+        this.$messagebox({
+          title: '错误',
+          message: err.data
+        })
       })
     },
     // 接口返回的职位详情有html的标签，此方法去掉html标签

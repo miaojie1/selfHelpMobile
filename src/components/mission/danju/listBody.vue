@@ -105,21 +105,29 @@ export default {
         'requestBody': JSON.stringify(params)
       }
       this.$http.post(url, data).then((val) => {
-        this.show = false
-        this.title = val.data.data.title
-        // alert(val.data.data.content.length)
-        if (val.data.data.content.length > 1) {
-          // 获取表头以及值
-          this.headContentKey = val.data.data.contentKey[0]
-          this.headContent = val.data.data.content[0]
-          // 获取数据以及值
-          for (var i = 0; i < (val.data.data.content.length - 1); i++) {
-            this.contentKey[i] = val.data.data.contentKey[i + 1]
-            this.content[i] = val.data.data.content[i + 1]
+        if (val.data.code === 200) {
+          this.show = false
+          this.title = val.data.data.title
+          // alert(val.data.data.content.length)
+          if (val.data.data.content.length > 1) {
+            // 获取表头以及值
+            this.headContentKey = val.data.data.contentKey[0]
+            this.headContent = val.data.data.content[0]
+            // 获取数据以及值
+            for (var i = 0; i < (val.data.data.content.length - 1); i++) {
+              this.contentKey[i] = val.data.data.contentKey[i + 1]
+              this.content[i] = val.data.data.content[i + 1]
+            }
+          } else {
+            this.headContentKey = val.data.data.contentKey[0]
+            this.headContent = val.data.data.content[0]
           }
         } else {
-          this.headContentKey = val.data.data.contentKey[0]
-          this.headContent = val.data.data.content[0]
+          this.$messagebox({
+            title: '错误',
+            message: val.data.msg
+          })
+          this.show = false
         }
       })
     },
@@ -145,9 +153,6 @@ export default {
 body {
   margin: 0px;
   background-color: rgb(243, 243, 243);
-}
-.noDataDiv {
-  margin-top: 50pt;
 }
 .danju_list_name_top {
   width: 90%;

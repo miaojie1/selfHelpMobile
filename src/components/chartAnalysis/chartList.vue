@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mt-header title="图表分析" fixed>
+    <mt-header :title="title" fixed>
       <router-link :to="backUrl" slot="left">
         <mt-button icon="back">返回</mt-button>
       </router-link>
@@ -29,10 +29,12 @@
 export default {
   data () {
     return {
-      backUrl: ''
+      backUrl: '',
+      title: ''
     }
   },
   created: function () {
+    this.title = this.$store.getters.chartTitle
     this.backUrl = '/chartAnalysis'
   },
   methods: {

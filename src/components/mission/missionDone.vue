@@ -140,8 +140,8 @@ export default{
       float: right;
       img {
         padding-top: 14pt;
-        width: 13pt;
-        height: 13pt;
+        width: 11pt;
+        height: 11pt;
       }
     }
   }
@@ -150,19 +150,19 @@ export default{
     height: 30pt;
     float: left;
   }
-  .noDataDiv {
-    width: 100%;
-    height: 50%;
-    margin: 0 auto;
-    margin-top: 50pt;
-    img {
-      width: 62%;
-      height: 30%;
-      margin-top: 45pt;
-    }
-    p {
-      margin-top: -10pt;
-      font-size: 11pt;
-    }
-  }
+  // .noDataDiv {
+  //   width: 100%;
+  //   height: 50%;
+  //   margin: 0 auto;
+  //   margin-top: 50pt;
+  //   img {
+  //     width: 62%;
+  //     height: 30%;
+  //     margin-top: 45pt;
+  //   }
+  //   p {
+  //     margin-top: -10pt;
+  //     font-size: 11pt;
+  //   }
+  // }
 </style>
