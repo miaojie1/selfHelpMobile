@@ -6,7 +6,11 @@
       </router-link>
     </mt-header>
     <div class="show-chart-panel" id="panel" ref="panel">
-      <div id="chart" ref="chart"></div>
+      <div id="chart" ref="chart">
+      </div>
+      <div class="nochart" v-if="chartData.length === 0 || chartData.length === undefined">
+        <img src="@/assets/none.png">
+      </div>
       <div class="show-chart-cata">
         <div class="catagray-item">
           <div class="catagray-item-title">
@@ -46,19 +50,31 @@
     <mt-popup
       v-model="popupYearVisible"
       position="bottom">
-      <mt-picker :slots="setYearDataSlot" @change="onYearChange">
+      <mt-picker :slots="setYearDataSlot" ref="yearPicker" :show-toolbar="true">
+        <div class="picker-toolbar-title">
+          <div class="usi-btn-cancel" @click="handleCancel">取消</div>
+          <div class="usi-btn-sure" @click="onYearChange">确定</div>
+        </div>
       </mt-picker>
     </mt-popup>
     <mt-popup
       v-model="popupCompanyVisible"
       position="bottom">
-      <mt-picker :slots="setCompanyDataSlot" @change="onCompanyChange">
+      <mt-picker :slots="setCompanyDataSlot" value-key="comPanyName" :show-toolbar="true" ref="companyPicker">
+        <div class="picker-toolbar-title">
+          <div class="usi-btn-cancel" @click="handleCancel">取消</div>
+          <div class="usi-btn-sure" @click="onCompanyChange">确定</div>
+        </div>
       </mt-picker>
     </mt-popup>
     <mt-popup
       v-model="popupDepartVisible"
       position="bottom">
-      <mt-picker :slots="setDepartDataSlot" @change="onDepartChange">
+      <mt-picker :slots="setDepartDataSlot" value-key="departName" :show-toolbar="true" ref="departPicker">
+         <div class="picker-toolbar-title">
+          <div class="usi-btn-cancel" @click="handleCancel">取消</div>
+          <div class="usi-btn-sure" @click="onDepartChange">确定</div>
+        </div>
       </mt-picker>
     </mt-popup>
   </div>
@@ -74,51 +90,37 @@ export default {
       // 返回的url
       backUrl: '',
       clientHeight: '',
-      // 判断当前是那种比例图，薪资/性别···
-      type: '',
+      clientWidth: '',
+      // 图表类型
+      type: 'pie',
       // 下部弹框
       popupYearVisible: false,
       popupCompanyVisible: false,
       popupDepartVisible: false,
       selectYears: [],
+      selectYearsLen: '',
       currentYear: '',
       selectCompany: [],
+      selectCompanyLen: '',
       currentCompany: '',
       defaultCompanyIndex: '',
       selectDepart: [],
+      selectDepartLen: '',
       currentDepart: '',
       defaultDepartIndex: '',
-      renyuanDataList: [20, 40, 60, 10, 70, 30],
-      renyuanData: [
-        {value: 80, name: '开发'},
-        {value: 20, name: '测试'},
-        {value: 10, name: '方案'},
-        {value: 40, name: '设计'},
-        {value: 20, name: '销售'},
-        {value: 100, name: '实施'}
-      ],
-      xueliData: [
-        {value: 100, name: '大专'},
-        {value: 150, name: '本科'},
-        {value: 120, name: '硕士'},
-        {value: 80, name: '博士'}
-      ],
-      xinziData: [
-        {value: 150, name: '<4k'},
-        {value: 310, name: '4k-5k'},
-        {value: 274, name: '5k-6k'},
-        {value: 235, name: '7k-9k'},
-        {value: 400, name: '>9k'}
-      ]
+      chartData: [],
+      codeData: []
     }
   },
   created: function () {
-    this.title = this.$route.query.chartTitle + '比例'
-    this.type = this.$route.query.chartTitle
-    this.backUrl = '/chartList'
+    this.title = this.$store.getters.chartType
+    this.backUrl = '/chartAnalysis?userName=' + window.localStorage.getItem('empNum')
+    if (this.$store.getters.depart === '') {
+      this.getData()
+    }
     this.setYear()
     this.setCompany()
-    this.setdepart()
+    this.getData()
   },
   computed: {
     // 设置选择框年份的值
@@ -127,7 +129,6 @@ export default {
         {
           flex: 1,
           values: this.selectYears,
-          className: 'slot1',
           textAlign: 'center'
         }
       ]
@@ -139,7 +140,6 @@ export default {
           flex: 1,
           values: this.selectCompany,
           defaultIndex: this.defaultCompanyIndex,
-          className: 'slot1',
           textAlign: 'center'
         }
       ]
@@ -151,7 +151,6 @@ export default {
           flex: 1,
           values: this.selectDepart,
           defaultIndex: this.defaultDepartIndex,
-          className: 'slot1',
           textAlign: 'center'
         }
       ]
@@ -159,280 +158,216 @@ export default {
     }
   },
   methods: {
-    // 人员比例图
-    drawRenYuan () {
-      let chart = echarts.init(document.getElementById('chart'))
-      var option = {
-        tooltip: {},
-        xAxis: {
-          data: ['开发', '测试', '方案', '设计', '销售', '实施']
-        },
-        yAxis: {},
-        toolbox: {
-          show: true,
-          feature: {
-            mark: {
-              show: true
-            },
-            dataView: {
-              show: true,
-              readOnly: false
-            },
-            magicType: {
-              show: true,
-              type: ['pie', 'funnel'],
-              option: {
-                funnel: {
-                  x: '25%',
-                  width: '50%',
-                  funnelAlign: 'left',
-                  max: 1548
+    getOption (type) {
+      let _this = this
+      var option = {}
+      let barImg = 'path://M977.709589 946.849315h-28.054794V234.257534c0-19.638356-15.430137-35.068493-35.068494-35.068493H737.841096c-19.638356 0-35.068493 15.430137-35.068493 35.068493v712.591781h-63.123288V51.90137c0-19.638356-15.430137-35.068493-35.068493-35.068493H427.835616c-19.638356 0-35.068493 15.430137-35.068493 35.068493v894.947945h-70.136986V396.975342c0-19.638356-15.430137-35.068493-35.068493-35.068493H110.816438c-19.638356 0-35.068493 15.430137-35.068493 35.068493v549.873973H54.706849c-19.638356 0-35.068493 15.430137-35.068493 35.068493s15.430137 35.068493 35.068493 35.068493h924.40548c19.638356 0 35.068493-15.430137 35.068493-35.068493s-16.832877-35.068493-36.471233-35.068493z m-831.824657 0V432.043836H252.493151v514.805479h-106.608219z m317.019178 0V86.969863h106.608219v859.879452H462.90411z m310.005479 0V269.326027h106.608219v677.523288h-106.608219z'
+      let pieImg = 'path://M512 55.296C260.096 55.296 55.296 260.096 55.296 512s204.8 456.704 456.704 456.704 456.704-204.8 456.704-456.704S763.904 55.296 512 55.296zM925.696 490.496 559.104 490.496 819.2 230.4C883.712 303.104 921.6 392.192 925.696 490.496zM512 929.792C281.6 929.792 94.208 742.4 94.208 512S281.6 94.208 512 94.208c106.496 0 204.8 43.008 277.504 106.496L494.592 494.592c-4.096 4.096-4.096 8.192-4.096 13.312 0 13.312 8.192 21.504 21.504 21.504l413.696 0C917.504 750.592 734.208 929.792 512 929.792z'
+      if (type === 'bar') {
+        option = {
+          xAxis: {
+            type: 'category',
+            data: '',
+            axisLabel: {
+              // 强制文字产生间隔
+              interval: 0,
+              // 文字逆时针旋转45°
+              rotate: 45,
+              // 文字样式
+              textStyle: {
+                fontSize: 11,
+                fontFamily: 'Microsoft YaHei'
+              }
+            }
+          },
+          yAxis: {
+            type: 'value',
+            data: ''
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: true
+              },
+              dataView: {
+                show: true,
+                readOnly: true,
+                optionToContent: function (opt) {
+                  var axisData = opt.xAxis[0].data
+                  var series = opt.series
+                  // var table = '<table style="width:100%;position:absolute;top:60px;left:5px;right:5px;text-align:center;scroll:auto"><tbody><tr style="background: #465295";font-color: #FFFFFF>' +
+                  var table = '<table style="width:100%;text-align:center;scroll:auto"><tbody><tr style="background: #465295";font-color: #FFFFFF>' +
+                    '<td><font color=white>序号</font></td>' +
+                    '<td><font color=white>类别</font></td>' +
+                    '<td><font color=white>数量</font></td>' +
+                    '</tr>'
+                  for (var i = 0, l = axisData.length; i < l; i++) {
+                    table += '<tr>' +
+                      '<td>' + (i + 1) + '</td>' +
+                      '<td>' + axisData[i] + '</td>' +
+                      '<td>' + series[0].data[i] + '</td>' +
+                      '</tr>'
+                  }
+                  table += '</tbody></table>'
+                  return table
+                }
+              },
+              restore: {
+                show: true
+              },
+              magicType: {
+                show: true,
+                type: ['line', 'bar']
+              },
+              myTool: {
+                show: true,
+                title: '切换图表类型',
+                icon: pieImg,
+                onclick: function () {
+                  _this.type = 'pie'
                 }
               }
             },
-            restore: {
-              show: true
-            },
-            saveAsImage: {
+            itemSize: 18,
+            itemGap: 16,
+            itemWidth: 28,
+            itemHeight: 16
+          },
+          legend: {
+            data: ''
+          },
+          dataZoom: [
+            {
+              type: 'slider',
               show: true,
-              type: 'png'
+              start: 0,
+              end: ''
             }
-          }
-        },
-        legend: {
-          data: ['开发', '测试', '方案', '设计', '销售', '实施']
-        },
-        color: function (value) {
-          return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
-        },
-        series: [{
-          name: '人员比例',
-          type: 'bar',
-          data: this.renyuanDataList,
-          barWidth: 30, // 柱图宽度
-          markPoint: {
-            symbolSize: 35,
+          ],
+          grid: {
+            x: '10%',
+            x2: '5%'
+          },
+          color: function (value) {
+            return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
+          },
+          series: [{
+            name: '比例',
+            type: 'bar',
+            data: '',
             itemStyle: {
               normal: {
                 label: {
                   show: true,
-                  color: '#fff' // 气泡中字体颜色
+                  position: 'top'
                 }
               }
             },
-            data: [
-              {
-                type: 'max'
-              },
-              {
-                type: 'min'
-              }
-            ]
-          },
-          markLine: {
-            data: [
-              {
-                type: 'average'
-              }
-            ]
-          }
-        }]
-      }
-      chart.setOption(option)
-    },
-    // 性别比例图
-    drawXingBie () {
-      let chart = echarts.init(document.getElementById('chart'))
-      var option = {
-        title: {
-          text: '男女比例图',
-          x: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          x: 'center',
-          y: 'bottom'
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            mark: {
-              show: true
-            },
-            dataView: {
-              show: true,
-              readOnly: false
-            },
-            magicType: {
-              show: true,
-              type: ['pie', 'funnel'],
-              option: {
-                funnel: {
-                  x: '25%',
-                  width: '50%',
-                  funnelAlign: 'left',
-                  max: 1548
+            barWidth: 30, // 柱图宽度
+            markLine: {
+              data: [
+                {
+                  type: 'average'
                 }
-              }
-            },
-            restore: {
-              show: true
-            },
-            saveAsImage: {
-              show: true,
-              type: 'png'
+              ]
             }
-          }
-        },
-        series: [
-          {
-            name: '男女比例',
+          }]
+        }
+      } else if (type === 'pie') {
+        option = {
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          toolbox: {
+            show: true,
+            feature: {
+              mark: {
+                show: true
+              },
+              dataView: {
+                show: true,
+                readOnly: true,
+                optionToContent: function (opt) {
+                  var series = opt.series[0].data
+                  // var table = '<table style="width:100%;position:absolute;top:60px;left:5px;right:5px;text-align:center;scroll:auto"><tbody><tr style="background: #465295";font-color: #FFFFFF>' +
+                  var table = '<table style="width:100%;text-align:center;scroll:auto"><tbody><tr style="background: #465295";font-color: #FFFFFF>' +
+                    '<td><font color=white>序号</font></td>' +
+                    '<td><font color=white>类别</font></td>' +
+                    '<td><font color=white>数量</font></td>' +
+                    '</tr>'
+                  for (var i = 0, l = series.length; i < l; i++) {
+                    table += '<tr>' +
+                      '<td>' + (i + 1) + '</td>' +
+                      '<td>' + series[i].name + '</td>' +
+                      '<td>' + series[i].value + '</td>' +
+                      '</tr>'
+                  }
+                  table += '</tbody></table>'
+                  return table
+                }
+              },
+              restore: {
+                show: true
+              },
+              myBtn: {
+                show: true,
+                title: '切换图表类型',
+                icon: barImg,
+                onclick: function () {
+                  _this.type = 'bar'
+                }
+              }
+            },
+            itemSize: 18,
+            itemGap: 16
+          },
+          legend: {
+            x: 'center',
+            y: 'bottom',
+            type: 'scroll',
+            bottom: 20,
+            pagemode: true,
+            pageButtonPosition: 'end',
+            pageButtonGap: 30,
+            pageButtonItemGap: 5,
+            pageIconSize: 18
+          },
+          series: [{
             type: 'pie',
-            radius: '55%',
-            // radius: ['30%', '60%'],
-            center: ['50%', '55%'],
-            data: [
-              {value: 650, name: '男'},
-              {value: 259, name: '女'}
-            ]
-          }
-        ],
-        color: function (value) {
-          return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
+            radius: ['30%', '55%'],
+            center: ['50%', '50%'],
+            label: {
+              normal: {
+                show: true,
+                formatter: '{b}:{c}',
+                textStyle: {
+                  fontWeight: 'normal'
+                }
+              }
+            },
+            data: '',
+            // 设置随机色
+            color: function (value) {
+              return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
+            },
+            lineStyle: {
+              color: '#465295'
+            },
+            animationType: 'scale',
+            animationEasing: 'elasticOut',
+            animationDelay: function (idx) {
+              return Math.random() * 200
+            }
+          }]
         }
       }
-      chart.setOption(option)
-    },
-    // 学历比例图
-    drawXueLi () {
-      let chart = echarts.init(document.getElementById('chart'))
-      var option = {
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            mark: {
-              show: true
-            },
-            dataView: {
-              show: true,
-              readOnly: false
-            },
-            magicType: {
-              show: true,
-              type: ['pie', 'funnel'],
-              option: {
-                funnel: {
-                  x: '25%',
-                  width: '50%',
-                  funnelAlign: 'left',
-                  max: 1548
-                }
-              }
-            },
-            restore: {
-              show: true
-            },
-            saveAsImage: {
-              show: true,
-              type: 'png'
-            }
-          }
-        },
-        legend: {
-          x: 'center',
-          y: 'bottom'
-        },
-        // color: ['rgb(236, 112, 107)', 'rgb(236, 112, 107)', 'rgb(198, 53, 49)', 'rgb(167, 45, 41)'],
-        color: function (value) {
-          return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
-        },
-        series: [{
-          name: '学历比例',
-          type: 'pie',
-          radius: ['30%', '60%'],
-          center: ['50%', '50%'],
-          data: this.xueliData.sort(function (a, b) { return a.value - b.value }),
-          animationType: 'scale',
-          animationEasing: 'elasticOut',
-          animationDelay: function (idx) {
-            return Math.random() * 200
-          }
-        }]
-      }
-      chart.setOption(option)
-    },
-    // 薪资比例图
-    drawXinZi () {
-      let chart = echarts.init(document.getElementById('chart'))
-      var option = {
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            mark: {
-              show: true
-            },
-            dataView: {
-              show: true,
-              readOnly: false
-            },
-            magicType: {
-              show: true,
-              type: ['pie', 'funnel'],
-              option: {
-                funnel: {
-                  x: '25%',
-                  width: '50%',
-                  funnelAlign: 'left',
-                  max: 1548
-                }
-              }
-            },
-            restore: {
-              show: true
-            },
-            saveAsImage: {
-              show: true,
-              type: 'png'
-            }
-          }
-        },
-        legend: {
-          x: 'center',
-          y: 'bottom'
-        },
-        series: [{
-          name: '薪资比例',
-          type: 'pie',
-          radius: ['30%', '60%'],
-          center: ['50%', '50%'],
-          data: this.xinziData.sort(function (a, b) { return a.value - b.value }),
-          // 南丁格尔玫瑰图
-          // roseType: 'radius',
-          color: function (value) {
-            return '#' + ('00000' + ((Math.random() * 16777215 + 0.5) >> 0).toString(16)).slice(-6)
-          },
-          animationType: 'scale',
-          animationEasing: 'elasticOut',
-          animationDelay: function (idx) {
-            return Math.random() * 200
-          }
-        }]
-      }
-      chart.setOption(option)
+      return option
     },
     handleYear () {
       this.popupYearVisible = true
+      // this.$refs.yearPicker.open()
     },
     handleCompany () {
       this.popupCompanyVisible = true
@@ -441,81 +376,242 @@ export default {
       this.popupDepartVisible = true
     },
     // 设置当前屏幕的高度 并绘制比例图
-    changeFixed (clientHeight) {
-      this.$refs.panel.style.height = clientHeight + 'px'
-      this.$refs.chart.style.height = (clientHeight * 0.6) + 'px'
-      if (this.type === '人员') {
-        this.drawRenYuan()
-      } else if (this.type === '性别') {
-        this.drawXingBie()
-      } else if (this.type === '学历') {
-        this.drawXueLi()
-      } else if (this.type === '薪资') {
-        this.drawXinZi()
-      }
+    changeFixed () {
+      let _this = this
+      this.$refs.chart.style.height = (this.clientHeight * 0.6) + 'px'
+      this.$refs.chart.style.width = this.clientWidth + 'px'
+      let chart = echarts.init(document.getElementById('chart'))
+      // chart.showLoading({
+      //   text: '正在努力的读取数据中···'
+      // })
+      // setTimeout (() => {
+      //   chart.closrLoading()
+      // }, 500)
+      chart.setOption(this.getOption(this.type), true)
+      // 为chart添加点击事件
+      chart.on('click', function (param) {
+        if (_this.type === 'bar') {
+          _this.$router.push({
+            path: '/listDetail',
+            query: {
+              listTitle: _this.title,
+              listTitleSub: param.name,
+              nums: param.value,
+              code: _this.codeData[param.dataIndex]
+            }
+          })
+        } else if (_this.type === 'pie') {
+          _this.$router.push({
+            path: '/listDetail',
+            query: {
+              listTitle: _this.title,
+              listTitleSub: param.data.name,
+              nums: param.data.value,
+              code: param.data.key
+            }
+          })
+        }
+      })
     },
     setYear () {
       let date = new Date()
       let year = date.getFullYear()
-      this.currentYear = year
+      this.currentYear = this.$store.getters.time
       for (var i = 0; i < 30; i++, year--) {
         this.selectYears[i] = year
       }
+      this.selectYearsLen = this.selectYears.length
       return this.selectYears
     },
     setCompany () {
+      let _this = this
       this.currentCompany = this.$store.getters.company
-      this.selectCompany = ['普联软件股份有限公司', '分公司一', '分公司二']
+      let depart = this.$store.getters.depart
+      this.selectCompany = this.$store.getters.allCompanys
+      this.selectCompanyLen = this.selectCompany.length
       this.selectCompany.forEach((element, index) => {
-        if (element === this.currentCompany) {
-          this.defaultCompanyIndex = index
+        if (element.comPanyID === _this.$store.getters.companyId) {
+          _this.defaultCompanyIndex = index
+        }
+        if (_this.currentCompany === element.comPanyName) {
+          _this.selectDepart = element.dePart
+          _this.selectDepartLen = _this.selectDepart.length
+          element.dePart.forEach((item, i) => {
+            if (depart === item) {
+              _this.currentDepart = item.departName
+              _this.defaultDepartIndex = i
+            }
+          })
         }
       })
       if (this.defaultCompanyIndex === '') {
-        this.defaultCompanyIndex = -1
+        _this.defaultCompanyIndex = -1
+      }
+      if (this.defaultDepartIndex === '') {
+        _this.defaultDepartIndex = -1
       }
     },
     setdepart () {
-      this.currentDepart = this.$store.getters.depart
-      this.selectDepart = ['HR事业部', '石油事业部', '平台研发部', '政务事业部', '整体']
-      if (this.$store.getters.depart === '') {
-        this.currentDepart = '整体'
-        this.defaultDepartIndex = 4
-      } else {
-        this.selectDepart.forEach((element, index) => {
-          if (element === this.currentDepart) {
-            this.defaultDepartIndex = index
-          }
-        })
-        if (this.defaultDepartIndex === '') {
-          this.defaultDepartIndex = -1
+      let _this = this
+      let depart = this.$store.getters.depart
+      this.selectCompany.forEach((element, index) => {
+        if (_this.currentCompany === element.comPanyName) {
+          _this.selectDepart = element.dePart
+          _this.selectDepartLen = _this.selectDepart.length
+          element.dePart.forEach((item, i) => {
+            if (depart === item) {
+              _this.currentDepart = item.departName
+              _this.defaultDepartIndex = i
+            }
+          })
         }
-      }
-    },
-    handleConfirm () {
-      this.popupYearVisible = false
+      })
     },
     handleCancel () {
       this.popupYearVisible = false
+      this.popupCompanyVisible = false
+      this.popupDepartVisible = false
+      this.$refs.yearPicker.close()
     },
-    onYearChange (picker, values) {
-      this.currentYear = values[0]
+    onYearChange () {
+      let value = this.$refs.yearPicker.getValues()[0]
+      this.popupYearVisible = false
+      this.currentYear = value
+      this.$store.dispatch('modifyTime', value)
+      this.getData()
     },
-    onCompanyChange (picker, values) {
-      this.currentCompany = values[0]
+    onCompanyChange () {
+      let value = this.$refs.companyPicker.getValues()[0]
+      this.popupCompanyVisible = false
+      this.currentCompany = value.comPanyName
+      this.$store.dispatch('modifyCompany', value.comPanyName)
+      this.$store.dispatch('modifyCompanyId', value.comPanyID)
+      if (this.$store.getters.depart === '') {
+        this.getData()
+      }
     },
-    onDepartChange (picker, values) {
-      this.currentDepart = values[0]
+    onDepartChange () {
+      let value = this.$refs.departPicker.getValues()[0]
+      this.popupDepartVisible = false
+      this.currentDepart = value.departName
+      this.$store.dispatch('modifyDepart', value)
+      this.getData()
+    },
+    changeData (testXData, testYData) {
+      let res = []
+      testXData.forEach((element, index) => {
+        res[index] = {
+          name: element,
+          value: testYData[index]
+        }
+      })
+      return res
+    },
+    getData () {
+      let url = '/statistics/getData'
+      let param = {
+        company: this.$store.getters.companyId,
+        depart: this.$store.getters.depart === '' ? '' : this.$store.getters.depart.departID,
+        time: this.$store.getters.time,
+        type: this.$store.getters.chartTypeKey
+      }
+      let data = {
+        'requestBody': JSON.stringify(param)
+      }
+      this.$http.post(url, data).then(res => {
+        if (res.data.code === 200) {
+          this.chartData = res.data.data
+          if (this.chartData.length === 0) {
+            this.$refs.chart.style.display = 'none'
+          } else {
+            this.$refs.chart.style.display = 'block'
+          }
+          this.transPie()
+        } else {
+          this.$messagebox({
+            title: '错误',
+            message: res.data.msg
+          })
+        }
+      })
+    },
+    transPie () {
+      let pieData = []
+      this.chartData.forEach((item, index) => {
+        let data = {
+          value: '',
+          name: '',
+          key: ''
+        }
+        data.value = item.value
+        data.name = item.key
+        data.key = item.code
+        pieData.push(data)
+      })
+      let chart = echarts.init(document.getElementById('chart'))
+      chart.setOption({
+        series: [{
+          data: pieData
+        }]
+      })
+    },
+    transBar () {
+      let _this = this
+      let xdata = []
+      let ydata = []
+      this.chartData.forEach((item, index) => {
+        _this.codeData[index] = item.code
+        ydata[index] = item.value
+        xdata[index] = item.key
+      })
+      let chart = echarts.init(document.getElementById('chart'))
+      chart.setOption({
+        xAxis: {
+          data: xdata
+        },
+        yAxis: {
+          data: ydata
+        },
+        legend: {
+          data: xdata
+        },
+        series: {
+          data: ydata
+        },
+        dataZoom: [
+          {
+            type: 'slider',
+            show: true,
+            start: 0,
+            end: ydata.length > 5 ? 50 : 100
+          }
+        ]
+      })
     }
   },
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
+    var w = document.documentElement.clientWidth || document.body.clientWidth
     // 减去页面上固定高度height
     this.clientHeight = h - 80
+    this.clientWidth = w - 10
   },
   watch: {
     clientHeight: function () {
-      this.changeFixed(this.clientHeight)
+      this.changeFixed()
+    },
+    type: function (valueType) {
+      let chart = echarts.init(document.getElementById('chart'))
+      // 设置option为true，不合并option值，每次都是重新赋值
+      chart.setOption(this.getOption(valueType), true)
+      if (valueType === 'bar') {
+        this.transBar()
+      } else if (valueType === 'pie') {
+        this.transPie()
+      }
+    },
+    currentCompany: function (value) {
+      this.setdepart()
     }
   }
 }
@@ -527,6 +623,15 @@ export default {
   .show-chart-cata {
     width: 100%;
     margin-top: 20pt;
+  }
+  .nochart {
+    width: 100%;
+    height: 100%;
+    margin-top: 50%;
+    img {
+      width: 80%;
+      height: 80%;
+    }
   }
 }
 .catagray-item {
@@ -602,11 +707,26 @@ export default {
   width: 90%;
   margin: 0 auto;
 }
-.picker-toolbar {
-  height: 0pt;
-}
 textarea {
-  width: 96% !important;
-  height: 96% !important;
+  width: 97% !important;
+  height: 97% !important;
+}
+.picker-toolbar-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+  color: black;
+}
+.usi-btn-cancel, .usi-btn-sure {
+  color: #465295
+}
+.picker-slot-wrapper {
+  overflow-y: scroll !important
+}
+.picker-toolbar {
+  height: 40px;
 }
 </style>

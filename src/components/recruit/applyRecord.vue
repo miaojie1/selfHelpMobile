@@ -6,7 +6,7 @@
       </router-link>
     </mt-header>
     <div class="ar_content">
-      <div v-if="applyData === '' || applyData === null">
+      <div v-if="applyData === '' || applyData === null || applyData.length === 0">
         <no-data title="申请记录"></no-data>
       </div>
       <div v-else class="ar_item" v-for="(n,index) in applyData.length" :key="n" @click="handleItem(applyData[index].positionId)">

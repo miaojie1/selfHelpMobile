@@ -108,7 +108,6 @@ export default {
         if (val.data.code === 200) {
           this.show = false
           this.title = val.data.data.title
-          // alert(val.data.data.content.length)
           if (val.data.data.content.length > 1) {
             // 获取表头以及值
             this.headContentKey = val.data.data.contentKey[0]

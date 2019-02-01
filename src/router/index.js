@@ -80,7 +80,10 @@ export default new Router({
     {
       path: '/chartAnalysis',
       name: 'ChartAnalysis',
-      component: () => import('@/components/chartAnalysis/companyList')
+      component: () => import('@/components/chartAnalysis/companyList'),
+      meta: {
+        keepAlive: true
+      }
     },
     {
       path: '/chartList',
@@ -89,6 +92,17 @@ export default new Router({
     {
       path: '/showChart',
       component: () => import('@/components/chartAnalysis/showChart')
+    },
+    {
+      path: '/listDetail',
+      component: () => import('@/components/chartAnalysis/lists')
     }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    // return 期望滚动到哪个的位置
+    return {
+      x: 0,
+      y: 0
+    }
+  }
 })

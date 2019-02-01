@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive"/>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive"/>
   </div>
 </template>
 <script>
@@ -13,6 +16,11 @@ export default {
   },
   created: function () {
     this.checkMobile()
+  },
+  beforeRouteLeave (to, from, next) {
+    // 设置下一个路由的 meta
+    to.meta.keepAlive = true
+    next()
   },
   methods: {
     // 判断当前机型

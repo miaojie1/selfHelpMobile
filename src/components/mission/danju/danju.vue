@@ -60,7 +60,7 @@ export default {
       let data = {
         'requestBody': JSON.stringify(params)
       }
-      this.$http.post(url, data, this).then((val) => {
+      this.$http.post(url, data).then((val) => {
         if (val.data.code === 200) {
           this.danjuData = val.data.data.data
           this.show = false
@@ -130,7 +130,7 @@ export default {
     text-align: left;
     padding-top: 4pt;
     padding-left: 10pt;
-    margin-top: 5pt;
+    margin-top: 2pt;
     background-color: white;
     .item_text {
       width: 70%;

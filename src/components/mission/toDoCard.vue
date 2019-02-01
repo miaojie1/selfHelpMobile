@@ -9,7 +9,7 @@
       <div v-for="(n, index) in rows" :key="index" class="todo_card">
         <div class="todo_card_content" @click="showDoneDetail(n)">
           <div class="list1">
-            <img src="@/assets/a7.png"/>
+            <img src="@/assets/ding.png"/>
             <div>
               <span class="value" style="font-size: 13pt;margin-left: 6pt">{{rows[index].task_username}}</span>
             </div>
@@ -324,9 +324,9 @@ body {
     display: flex;
     flex-flow: row;
     img {
-      width: 20pt;
-      height: 20pt;
-      padding-top: 0pt;
+      width: 15pt;
+      height: 15pt;
+      padding-top: 1pt;
     }
     div {
       width: 70%;

@@ -174,7 +174,7 @@ body {
     width: 97%;
     height: 45pt;
     background-color: white;
-    margin-top: 5pt;
+    margin-top: 2pt;
     padding-top: 7pt;
     padding-left: 7pt;
     img {

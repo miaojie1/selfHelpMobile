@@ -46,10 +46,28 @@ export const modifyChartTitle = (state, val) => {
 }
 export const back = (state, val) => {
   if (val === 'isAn') {
-    alert(val)
-    window.webkit.messageHandlers.Call.postMessage({})
+    // 安卓监听
+    window.location.href = 'nativeJump://mWebView'
   } else if (val === 'isIos') {
-    alert(val)
+    // ios接收
     window.webkit.messageHandlers.Call.postMessage({})
   }
+}
+export const modifyChartType = (state, val) => {
+  state.chartType = val
+}
+export const modifyChartTypeKey = (state, val) => {
+  state.chartTypeKey = val
+}
+export const modifyAllCompanys = (state, val) => {
+  state.allCompanys = val
+}
+export const modifyAllDeparts = (state, val) => {
+  state.allDeparts = val
+}
+export const modifyTime = (state, val) => {
+  state.time = val
+}
+export const modifyCompanyId = (state, val) => {
+  state.companyId = val
 }

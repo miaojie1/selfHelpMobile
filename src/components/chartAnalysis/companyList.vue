@@ -6,441 +6,154 @@
         <span>返回</span>
       </div>
       <!-- 头部下拉框 -->
-      <div class="select-body">
-        <input type="text" v-model="selectValue" readonly @click="showList"/>
-        <img src="@/assets/down.png" @click="showList">
+      <div class="select-body" v-if="showNull">
+        <input type="text" v-model="selectCompanyValue" readonly/>
       </div>
-      <div class="chart-btn" @click="showChart">
-        <img src="@/assets/chartAn.png">
+      <div class="select-body" v-else>
+        <input type="text" v-model="selectCompanyValue" readonly @click="showList"/>
+        <img src="@/assets/down.png" @click="showList">
       </div>
     </div>
     <!-- 下拉列表 -->
     <div class="select-list-panel" v-show="isShow">
-      <ul>
-        <li v-for="(item, index) in company" :key="index" @click="closeList(item.label, item.value)" :class="{haveSelect: selectValue === item.label}">
-          <span>{{item.label}}</span>
-          <div class="line"></div>
-        </li>
-      </ul>
+      <div class="select-list-item" v-for="(item, index) in company" :key="index" @click="closeList(item.comPanyID, item.comPanyName)" :class="{haveSelect: selectCompanyValue === item.comPanyName}">
+        <div class="select-list-item-name">{{item.comPanyName}}</div>
+        <div class="line"></div>
+      </div>
     </div>
     <!--页面的遮罩层 -->
     <div id="cover" v-show="isShow" @click="closeList"></div>
     <div id="container" :class="{haveScroll: isShow}">
-      <mt-search
-        v-model="searchValue"
-        :result.sync="results"
-        cancel-text="取消"
-        placeholder="搜索">
-      </mt-search>
-      <!--搜索框及时显示-->
-      <div id="showResults" v-show="resultsPanel" :class="{haveShow: resultsPanel}">
-        <div class="resItem" v-for="(item, index) in results" :key="index" @click="goToDepart(item.label)">
-          <div class="resItem-text">
-            {{item.label}}
-          </div>
-          <!-- <img src="@/assets/chart-circle.png" class="li-chartImg"> -->
-        </div>
+      <div class="chart-item">
+        <img src="@/assets/zaigang.png" @click="handleChart('在岗员工构成', 'H_YGXS')">
+        <span>在岗员工构成</span>
       </div>
-      <div class="departContainer">
-        <ul v-for="(depart, index) in companyList1" :key="index">
-          <div class="ul-title" @click="goToDepart(depart.depart)">
-            {{depart.depart}}
-          </div>
-          <li v-for="(item, index) in depart.emp" :key="index">
-            <span>{{item.empName}}</span>
-          </li>
-        </ul>
-        <!-- 没有组 -->
-        <!-- <ul>
-          <li v-for="(item, index) in depart" :key="index" @click="goToDepart(item.label)">
-            <span>{{item.label}}</span>
-          </li>
-        </ul> -->
+      <div class="chart-item">
+        <img src="@/assets/ligang.png" @click="handleChart('离岗人员构成', 'H_YDSJ')">
+        <span>离岗人员构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/guanli.png" @click="handleChart('管理人员构成', 'H_ZJ')">
+        <span>管理人员构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/age.png" @click="handleChart('年龄构成', 'H_AGE')">
+        <span>年龄构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/zhuanye.png" @click="handleChart('专业技术资格构成', 'H_ZYJSZWZG')">
+        <span>专业技术资格构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/xueli.png" @click="handleChart('学历构成', 'H_XL')">
+        <span>学历构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/pinyong.png" @click="handleChart('聘用专业技术职务构成', 'H_PRZYJSZW')">
+        <span>聘用专业技术职务构成</span>
+      </div>
+      <div class="chart-item">
+        <img src="@/assets/zhiye.png" @click="handleChart('职业技能等级构成', 'H_ZYJNDJ')">
+        <span>职业技能等级构成</span>
       </div>
     </div>
   </div>
 </template>
 <script>
+import noData from '../common/noData'
 export default {
   data () {
     return {
-      modal_loading: false,
-      questionImageIsShow: false,
       resultsPanel: false,
       results: [],
-      company: [
-        {
-          value: '0',
-          label: '普联软件股份有限公司'
-        },
-        {
-          value: '1',
-          label: '普联分公司一有限公司有限公司'
-        },
-        {
-          value: '2',
-          label: '分公司二'
-        },
-        {
-          value: '3',
-          label: '分公司三'
-        }
-      ],
-      depart: [
-        {
-          value: '0',
-          label: 'HR事业部'
-        },
-        {
-          value: '1',
-          label: '石油事业部'
-        },
-        {
-          value: '2',
-          label: '产品研发部'
-        },
-        {
-          value: '3',
-          label: '政务事业部'
-        },
-        {
-          value: '4',
-          label: '平台研发部'
-        }
-      ],
+      company: [],
+      depart: [],
       // 下拉框绑定的值
-      selectValue: '',
+      selectCompanyValue: '',
+      selectCompanyId: '',
       // 搜索框绑定的值
       searchValue: '',
       // 控制下拉框是否显示
       isShow: false,
-      showCompanyList: '',
-      companyList1: [
-        {
-          depart: 'HR事业部',
-          departId: '1',
-          index: 'HR',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '研发组'
-            },
-            {
-              empNum: '00012',
-              empName: '测试组'
-            },
-            {
-              empNum: '00013',
-              empName: '实施组'
-            },
-            {
-              empNum: '00014',
-              empName: '方案组'
-            }
-          ]
-        },
-        {
-          depart: '石油事业部',
-          departId: '2',
-          index: '产品',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '研发组'
-            },
-            {
-              empNum: '00012',
-              empName: '测试组'
-            },
-            {
-              empNum: '00013',
-              empName: '实施组'
-            },
-            {
-              empNum: '00014',
-              empName: '方案组'
-            }
-          ]
-        },
-        {
-          depart: '产品研发部',
-          departId: '3',
-          index: '石油',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '研发组'
-            },
-            {
-              empNum: '00012',
-              empName: '测试组'
-            },
-            {
-              empNum: '00013',
-              empName: '实施组'
-            },
-            {
-              empNum: '00014',
-              empName: '方案组'
-            }
-          ]
-        },
-        {
-          depart: '平台研发部',
-          departId: '4',
-          index: '测试',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '研发组'
-            },
-            {
-              empNum: '00012',
-              empName: '测试组'
-            },
-            {
-              empNum: '00013',
-              empName: '实施组'
-            },
-            {
-              empNum: '00014',
-              empName: '方案组'
-            }
-          ]
-        }
-      ],
-      companyList2: [
-        {
-          depart: 'HR事业部2',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '张三1'
-            },
-            {
-              empNum: '00012',
-              empName: '张三2'
-            },
-            {
-              empNum: '00013',
-              empName: '张三3'
-            },
-            {
-              empNum: '00014',
-              empName: '张三4'
-            }
-          ]
-        },
-        {
-          depart: '产品研发部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '李三1'
-            },
-            {
-              empNum: '00012',
-              empName: '李三2'
-            },
-            {
-              empNum: '00013',
-              empName: '李三3'
-            },
-            {
-              empNum: '00014',
-              empName: '李三4'
-            }
-          ]
-        },
-        {
-          depart: 'HR事业部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '张三1'
-            },
-            {
-              empNum: '00012',
-              empName: '张三2'
-            },
-            {
-              empNum: '00013',
-              empName: '张三3'
-            },
-            {
-              empNum: '00014',
-              empName: '张三4'
-            }
-          ]
-        },
-        {
-          depart: '产品研发部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '李三1'
-            },
-            {
-              empNum: '00012',
-              empName: '李三2'
-            },
-            {
-              empNum: '00013',
-              empName: '李三3'
-            },
-            {
-              empNum: '00014',
-              empName: '李三4'
-            }
-          ]
-        }
-      ],
-      companyList3: [
-        {
-          depart: 'HR事业部3',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '张三1'
-            },
-            {
-              empNum: '00012',
-              empName: '张三2'
-            },
-            {
-              empNum: '00013',
-              empName: '张三3'
-            },
-            {
-              empNum: '00014',
-              empName: '张三4'
-            }
-          ]
-        },
-        {
-          depart: '产品研发部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '李三1'
-            },
-            {
-              empNum: '00012',
-              empName: '李三2'
-            },
-            {
-              empNum: '00013',
-              empName: '李三3'
-            },
-            {
-              empNum: '00014',
-              empName: '李三4'
-            }
-          ]
-        },
-        {
-          depart: 'HR事业部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '张三1'
-            },
-            {
-              empNum: '00012',
-              empName: '张三2'
-            },
-            {
-              empNum: '00013',
-              empName: '张三3'
-            },
-            {
-              empNum: '00014',
-              empName: '张三4'
-            }
-          ]
-        },
-        {
-          depart: '产品研发部',
-          departId: '1',
-          emp: [
-            {
-              empNum: '00011',
-              empName: '李三1'
-            },
-            {
-              empNum: '00012',
-              empName: '李三2'
-            },
-            {
-              empNum: '00013',
-              empName: '李三3'
-            },
-            {
-              empNum: '00014',
-              empName: '李三4'
-            }
-          ]
-        }
-      ],
+      showDepartList: '',
       chartVisible: false,
-      clientHeight: ''
+      clientHeight: '',
+      showNull: false,
+      haveDepartPower: ''
     }
   },
   created () {
-    // this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
-    // window.localStorage.setItem('empNum', this.$route.getters.missionEmpNum)
-    this.selectValue = this.company[0].label
-    this.showCompanyList = this.companyList1
+    this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
+    window.localStorage.setItem('empNum', this.$store.getters.missionEmpNum)
+    this.$indicator.open({
+      text: '加载中...',
+      spinnerType: 'fading-circle'
+    })
+    let date = new Date()
+    this.time = date.getFullYear()
+    this.$store.dispatch('modifyTime', this.time)
+    this.getSelect()
   },
   methods: {
+    getSelect () {
+      let url = '/statistics/getSelect'
+      let param = {
+        userID: window.localStorage.getItem('empNum')
+      }
+      let data = {
+        'requestBody': JSON.stringify(param)
+      }
+      this.$http.post(url, data).then(res => {
+        this.$store.dispatch('modifyAllCompanys', res.data.data[0].unitDepartData)
+        if (res.data.data[0].unitDepartData.length >= 1) {
+          this.selectCompanyValue = res.data.data[0].unitDepartData[0].comPanyName
+          this.selectCompanyId = res.data.data[0].unitDepartData[0].comPanyID
+          this.company = res.data.data[0].unitDepartData
+          this.depart = res.data.data[0].unitDepartData[0].dePart
+          this.haveDepartPower = res.data.data[0].unitDepartData[0].haveDePartPower
+          this.$store.dispatch('modifyCompany', this.selectCompanyValue)
+          this.$store.dispatch('modifyCompanyId', this.selectCompanyId)
+          this.$indicator.close()
+        } else {
+          this.showNull = true
+          this.selectCompanyValue = '暂无数据'
+          this.$indicator.close()
+        }
+      })
+    },
     showList () {
       this.isShow = true
     },
-    closeList (value, id) {
-      if (typeof value === 'string') {
-        this.isShow = false
-        this.selectValue = value
-        this.$store.dispatch('modifyCompany', value)
-        if (id === '1') {
-          this.showCompanyList = this.companyList1
-        } else if (id === '2') {
-          this.showCompanyList = this.companyList2
-        } else if (id === '3') {
-          this.showCompanyList = this.companyList3
-        } else if (id === '0') {
-          this.showCompanyList = this.companyList1
+    closeList (id, value) {
+      this.company.forEach(item => {
+        if (id === item.comPanyID) {
+          this.depart = item.dePart
+          this.selectCompanyValue = value
+          this.selectCompanyId = id
+          this.haveDepartPower = item.haveDePartPower
+          this.$store.dispatch('modifyCompany', value)
+          this.$store.dispatch('modifyCompanyId', id)
         }
-      } else {
-        this.isShow = false
-      }
-    },
-    handleDepart (value) {
-      console.log('点击部门' + value)
+      })
+      this.isShow = false
     },
     showChart () {
-      this.$store.dispatch('modifyCompany', this.selectValue)
+      this.$store.dispatch('modifyCompany', this.selectCompanyValue)
+      this.$store.dispatch('modifyDepart', '')
       this.$store.dispatch('modifyChartTitle', this.$store.getters.company + '图表分析')
       this.$router.push({
         path: '/chartList'
       })
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     },
-    goToDepart (value) {
-      this.searchValue = ''
-      this.resultsPanel = false
-      this.$store.dispatch('modifyDepart', value)
-      this.$store.dispatch('modifyChartTitle', this.$store.getters.depart + '图表分析')
+    handleChart (val, key) {
+      this.$store.dispatch('modifyChartType', val)
+      this.$store.dispatch('modifyChartTypeKey', key)
+      this.$store.dispatch('modifyDepart', '')
       this.$router.push({
-        path: '/chartList'
+        path: '/showChart'
       })
     },
     changeFixed (clientHeight) {
@@ -455,7 +168,7 @@ export default {
       } else {
         var reg = new RegExp(value)
         this.depart.forEach(element => {
-          if (reg.test(element.label)) {
+          if (reg.test(element.departName)) {
             this.results.push(element)
             this.resultsPanel = true
           }
@@ -465,6 +178,9 @@ export default {
     clientHeight: function () {
       this.changeFixed(this.clientHeight)
     }
+  },
+  components: {
+    noData
   },
   beforeMount () {
     var h = document.documentElement.clientHeight || document.body.clientHeight
@@ -484,18 +200,18 @@ body {
   background-color:#465295;
   height: 64px;
   width: 100%;
-  margin-top: 0pt;
+  top: 0px;
   position: fixed;
   z-index: 100;
   .chart-btn {
     width: 15%;
     float: right;
     color: white;
-    margin-top: 20pt;
+    margin-top: 22pt;
     font-size: 12pt;
     img {
-      width: 50%;
-      height: 50%;
+      width: 40%;
+      height: 40%;
     }
   }
 }
@@ -553,29 +269,27 @@ body {
 .select-list-panel {
   width: 100%;
   z-index: 9999;
+  height: 100%;
+  overflow-y: scroll;
   position: absolute;
   background-color: white;
   margin-top: 48pt;
-  span {
-    display: block;
-    width: 90%;
-    margin-left: 5pt;
-  }
-  ul {
-    margin: 0pt;
-    padding-left: 0pt;
-  }
-  li {
+  .select-list-item {
     width: 100%;
-    margin: 0 auto;
-    list-style-type: none;
-    text-align: left;
     height: 36pt;
     line-height: 36pt;
     font-size: 12pt;
-    padding-left: 10pt;
+    text-align: left;
+    display: flex;
+    flex-flow: column;
+    .select-list-item-name {
+      display: block;
+      width: 90%;
+      height: 35pt;
+      margin-left: 10pt;
+    }
     .line {
-      width: 93%;
+      width: 100%;
       height: 0.5pt;
       margin: 0 auto;
       margin-left: 0pt;
@@ -643,7 +357,29 @@ select {
   margin-bottom: -20pt;
   overflow: scroll;
   width: 100%;
-  height: 100%;;
+  margin: 0 auto;
+  margin-top: 70pt;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+.chart-item {
+  width: 50%;
+  height: 10%;
+  display: flex;
+  flex-flow: column;
+  margin-bottom: 20pt;
+  img {
+    margin: 0 auto;
+    width: 5rem;
+    height: 5rem;
+  }
+  span {
+    display: block;
+    margin-top: 5pt;
+    font-size: 13pt;
+  }
 }
 .mint-search {
   height: 44pt !important;
@@ -651,7 +387,7 @@ select {
   padding-top: 47pt !important;
   overflow: hidden;
   .mint-searchbar-inner {
-    height: 18pt;
+    height: 20pt;
     border-radius: 5pt;
     background: #7986B7 !important;
   }
@@ -662,7 +398,7 @@ select {
   }
   .mint-searchbar {
     height: 44pt;
-    padding: 4px 6px;
+    padding: 4px 16px;
     background-color: #465295;
   }
   .mint-searchbar-cancel {
@@ -701,66 +437,39 @@ select {
 }
 .resItem {
   width: 100%;
-  height: 30pt;
+  height: 40pt;
   background: #f7f5f4;
-  float: left;
   .resItem-text {
     width: 30%;
-    line-height: 30pt;
-    float: left;
+    height: 40pt;
+    text-align: left;
+    margin-left: 10pt;
+    line-height: 40pt;
   }
 }
 .departContainer {
-  width: 96% !important;
+  width: 100% !important;
+  height: 100%;
+  background-color: #F8F8F8;
   position: absolute !important;
   z-index: 0 !important;
-  ul {
-    margin: 0pt 0pt;
-    padding: 0pt;
-    .ul-title {
-      width: 100%;
-      height: 24pt;
-      line-height: 24pt;
-      text-align: left;
-      background: #EBEBEB;
-      padding-left: 10pt;
-      color: #000000;
-    }
-  }
-  li {
+  .chart-depart-item {
+    height: 50pt;
     width: 100%;
-    margin: 0pt;
-    list-style: none;
-    height: 30pt;
+    background-color: #FFFFFF !important;
+    line-height: 50pt;
     text-align: left;
     padding-left: 10pt;
-    line-height: 29pt;
-    background: white;
-    border-bottom: 0.5pt #D9D9D9 solid;
-    span {
-      width: 60%;
-      display: block;
-      float: left;
-      padding-top: 1pt;
-      margin-left: 5pt;
-    }
-  }
-  .li-depart-img {
-    width: 15pt;
-    height: 15pt;
-    float: left;
-    margin-top: 1pt;
-  }
-  .li-chartImg {
-    width: 20pt;
-    height: 20pt;
-    float: right;
-    margin-right: 12pt;
+    box-sizing: border-box;
+    border-bottom: 0.1pt #D9D9D9 solid;
   }
 }
-.haveSelect {
-  background: #EEEFF6;
-}
+// .haveSelect {
+//   background: #EEEFF6;
+// }
+// .clickDepart {
+//   background-color: rgb(224, 228, 241);
+// }
 .haveScroll {
   position: fixed;
 }

@@ -89,7 +89,7 @@ export default {
       this.$refs.inforContainer.style.height = clientHeight + 'px'
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   watch: {

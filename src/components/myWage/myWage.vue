@@ -6,15 +6,18 @@
       </router-link>
     </mt-header>
     <div class="wage_header_content">
+      <span class="wage_name_span" v-if="username === '' || username === null">暂无</span>
       <span class="wage_name_span">{{username}}</span>
       <span v-if="userPart === '' || userPart === null" class="wage_part_span">暂无部门信息</span>
       <span v-else class="wage_part_span">{{userPart}}</span>
     </div>
     <div class="wage_date_div">
-      <span @click="openDatePicker">
+      <div @click="openDatePicker" class="wage_date_div_time">
         {{currentYear}}-{{currentMonth}}
-      </span>
-      <img src="@/assets/g3.png" @click="openDatePicker"/>
+      </div>
+      <div class="wage_date_div_img">
+        <img src="@/assets/g3.png" @click="openDatePicker"/>
+      </div>
     </div>
     <div class="noDataDiv" v-if="content === '' || content === null">
       <img src="@/assets/none.png">
@@ -66,7 +69,7 @@ export default{
   data () {
     return {
       username: '',
-      userPart: '普联公司 事业部门 开发',
+      userPart: '',
       // 当前选中的年份 用于时间选择器
       currentYear: '',
       // 当前选中的月份 用于时间选择器
@@ -398,7 +401,7 @@ export default{
       })
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   components: {
@@ -447,19 +450,39 @@ export default{
     position: relative;
     top: -20pt;
     border-bottom: rgb(214, 217, 221) 1pt solid;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    .wage_date_div_time {
+      width: 30%;
+      color: #178FFF;
+      font-size: 16pt;
+      line-height: 44pt;
+    }
+    .wage_date_div_img {
+      width: 10%;
+      height: 18pt;
+      line-height: 44pt;
+      img {
+        width: 20pt;
+        height: 18pt;
+        line-height: 20pt;
+        padding-top: 12pt;
+      }
+    }
   }
-  .wage_date_div span{
-    color: #178FFF;
-    font-size: 16pt;
-    margin: 0 auto;
-    line-height: 40pt;
-  }
-  .wage_date_div img{
-    width: 20pt;
-    height: 18pt;
-    line-height: 20pt;
-    padding-left: 8pt;
-  }
+  // .wage_date_div span{
+  //   color: #178FFF;
+  //   font-size: 16pt;
+  //   margin: 0 auto;
+  //   line-height: 40pt;
+  // }
+  // .wage_date_div img{
+  //   width: 20pt;
+  //   height: 18pt;
+  //   line-height: 20pt;
+  //   padding-left: 8pt;
+  // }
   .wage_body_content{
     width: 90%;
     margin: 0 auto;

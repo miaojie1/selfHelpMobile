@@ -49,6 +49,10 @@ export default{
     this.$store.dispatch('modifyMissionEmpNum', this.$route.query.userName)
     // 设置任务类型全局变量，待办or已办
     this.$store.dispatch('modifyMissionTaskType', 'pending')
+    // this.$indicator.open({
+    //   text: 'Loading...',
+    //   spinnerType: 'fading-circle'
+    // })
     this.getToDoMission()
   },
   methods: {
@@ -80,17 +84,19 @@ export default{
             message: val.data.msg
           })
         }
+        // this.$indicator.close()
         this.show = false
       }).catch((val) => {
         this.$messagebox({
           title: '错误',
-          message: val.data
+          message: val
         })
+        // this.$indicator.close()
         this.show = false
       })
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   computed: {
@@ -121,7 +127,7 @@ export default{
     text-align: left;
     padding-top: 4pt;
     padding-left: 5pt;
-    margin-top: 5pt;
+    margin-top: 2pt;
     background-color: white;
     border-bottom: 1pt solid rgb(245, 241, 241);
     border-top: 1pt solid rgb(248, 245, 245);

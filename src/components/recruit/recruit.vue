@@ -220,7 +220,7 @@ export default {
       })
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   computed: {
@@ -274,7 +274,7 @@ body {
 .re_item {
   width: 100%;
   height: 65pt;
-  margin-top: 6pt;
+  margin-top: 2pt;
   background-color: white;
   text-align: left;
   padding-left: 10pt;

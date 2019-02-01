@@ -77,7 +77,7 @@ export default{
       })
     },
     handleBack () {
-      window.webkit.messageHandlers.Call.postMessage({})
+      this.$store.commit('back', window.localStorage.getItem('mobileType'))
     }
   },
   computed: {
@@ -112,7 +112,7 @@ export default{
     text-align: left;
     padding-top: 4pt;
     padding-left: 10pt;
-    margin-top: 5pt;
+    margin-top: 2pt;
     background-color: white;
     border-bottom: 1pt solid rgb(245, 241, 241);
     border-top: 1pt solid rgb(248, 245, 245);

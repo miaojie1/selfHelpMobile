@@ -14,3 +14,9 @@ export const missionTitle = state => state.missionTitle
 export const depart = state => state.depart
 export const company = state => state.company
 export const chartTitle = state => state.chartTitle
+export const allCompanys = state => state.allCompanys
+export const allDeparts = state => state.allDeparts
+export const chartType = state => state.chartType
+export const chartTypeKey = state => state.chartTypeKey
+export const time = state => state.time
+export const companyId = state => state.companyId
